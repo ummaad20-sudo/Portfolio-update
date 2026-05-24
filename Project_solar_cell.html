@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulasi Spesifikasi Solar Cell</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Barlow:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sol: #F5A623;
+    --sol-light: #FFD080;
+    --sol-dark: #C47D0E;
+    --bg: #0A0E14;
+    --bg2: #111620;
+    --bg3: #1A2030;
+    --border: #2A3550;
+    --text: #C8D8F0;
+    --text-dim: #6A7A9A;
+    --green: #2ECC71;
+    --red: #E74C3C;
+    --blue: #3498DB;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+  }
+
+  /* Animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(245,166,35,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,166,35,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 36px;
+    padding: 36px 24px;
+    background: linear-gradient(135deg, rgba(245,166,35,0.08), rgba(245,166,35,0.02));
+    border: 1px solid rgba(245,166,35,0.25);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '☀';
+    position: absolute;
+    top: -20px; right: -20px;
+    font-size: 140px;
+    opacity: 0.04;
+    line-height: 1;
+  }
+  .header-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--sol);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .header h1 span { color: var(--sol); }
+  .header p {
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 300;
+  }
+
+  /* Section title */
+  .sec-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--sol);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sec-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ======================== BEBAN TABLE ======================== */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .card-head {
+    background: var(--bg3);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card-head .label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    background: rgba(245,166,35,0.15);
+    color: var(--sol);
+    border: 1px solid rgba(245,166,35,0.3);
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    padding: 10px 20px;
+    text-align: left;
+    background: rgba(0,0,0,0.2);
+    border-bottom: 1px solid var(--border);
+  }
+  th.num { text-align: right; }
+  td {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(42,53,80,0.5);
+    font-size: 14px;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(245,166,35,0.03); }
+  td.num { text-align: right; font-family: 'Share Tech Mono', monospace; font-size: 13px; }
+  td.highlight { color: var(--sol); font-weight: 600; font-family: 'Share Tech Mono', monospace; }
+  .tfoot td {
+    background: rgba(245,166,35,0.07);
+    border-top: 1px solid rgba(245,166,35,0.25);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--sol-light);
+  }
+  .pill {
+    display: inline-block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    background: rgba(46,204,113,0.1);
+    color: var(--green);
+    border: 1px solid rgba(46,204,113,0.2);
+  }
+
+  /* ======================== ASUMSI BOX ======================== */
+  .asumsi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    padding: 20px;
+  }
+  .asumsi-item {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 14px 16px;
+  }
+  .asumsi-item .key {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .asumsi-item .val {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--sol-light);
+  }
+  .asumsi-item .unit {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-left: 4px;
+  }
+
+  /* ======================== SPEC CARDS ======================== */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .spec-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .spec-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .spec-card.sol::before { background: linear-gradient(90deg, var(--sol-dark), var(--sol)); }
+  .spec-card.bat::before { background: linear-gradient(90deg, #1565C0, #42A5F5); }
+  .spec-card.inv::before { background: linear-gradient(90deg, #6A1B9A, #AB47BC); }
+  .spec-card.scc::before { background: linear-gradient(90deg, #2E7D32, #66BB6A); }
+
+  .spec-card-head {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .spec-icon {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .spec-card-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+  }
+  .spec-card-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .spec-body { padding: 16px 20px; }
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(42,53,80,0.4);
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-row .sk { font-size: 13px; color: var(--text-dim); }
+  .spec-row .sv {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    text-align: right;
+  }
+  .spec-row .sv.main {
+    font-size: 15px;
+    color: var(--sol-light);
+    font-weight: bold;
+  }
+  .spec-result {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: rgba(245,166,35,0.08);
+    border: 1px solid rgba(245,166,35,0.2);
+    border-radius: 3px;
+    text-align: center;
+  }
+  .spec-result .r-label { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 4px; }
+  .spec-result .r-val {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--sol);
+  }
+
+  /* ======================== KABEL ======================== */
+  .kabel-body { padding: 16px 20px; }
+  .kabel-row {
+    display: flex; justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(42,53,80,0.4);
+    align-items: center;
+  }
+  .kabel-row:last-child { border-bottom: none; }
+  .kabel-name { font-size: 13px; color: var(--text); }
+  .kabel-spec {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: #64B5F6;
+  }
+
+  /* ======================== BOM TABLE ======================== */
+  .bom-table th { background: rgba(0,0,0,0.3); }
+  .bom-table .no { width: 40px; color: var(--text-dim); }
+  .bom-table .satuan { width: 60px; }
+  .bom-table .jumlah { width: 80px; }
+  .item-cat {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 7px;
+    border-radius: 2px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .cat-utama { background: rgba(245,166,35,0.1); color: var(--sol); border: 1px solid rgba(245,166,35,0.2); }
+  .cat-batt { background: rgba(52,152,219,0.1); color: #64B5F6; border: 1px solid rgba(52,152,219,0.2); }
+  .cat-kabel { background: rgba(46,204,113,0.1); color: #66BB6A; border: 1px solid rgba(46,204,113,0.2); }
+  .cat-acc { background: rgba(171,71,188,0.1); color: #CE93D8; border: 1px solid rgba(171,71,188,0.2); }
+  .cat-lain { background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid var(--border); }
+
+  /* ======================== CATATAN ======================== */
+  .notes {
+    background: rgba(231,76,60,0.05);
+    border: 1px solid rgba(231,76,60,0.2);
+    border-left: 3px solid var(--red);
+    padding: 16px 20px;
+    border-radius: 3px;
+    margin-bottom: 24px;
+  }
+  .notes .n-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #EF9A9A;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  .notes ul { list-style: none; }
+  .notes ul li {
+    font-size: 13px;
+    color: var(--text-dim);
+    padding: 4px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+  .notes ul li::before {
+    content: '▸';
+    position: absolute; left: 0;
+    color: var(--red);
+    opacity: 0.6;
+  }
+
+  /* ======================== SUMMARY TOTAL ======================== */
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .sum-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+    text-align: center;
+  }
+  .sum-item .s-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .sum-item .s-val {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--sol);
+  }
+  .sum-item .s-unit { font-size: 13px; color: var(--text-dim); }
+
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 12px;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 600px) {
+    .spec-grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 24px; }
+    .asumsi-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-tag">⚡ Sistem Energi Terbarukan</div>
+    <h1>KALKULASI <span>SOLAR CELL</span></h1>
+    <p>Spesifikasi Bahan & Alat · Total Beban 550 Watt · Off-Grid System</p>
+  </div>
+
+  <!-- BAGIAN 1: DAFTAR BEBAN -->
+  <div class="sec-title">01 · Daftar Beban Listrik</div>
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-head">
+      <span class="label">ANALISA KEBUTUHAN DAYA</span>
+      <span class="badge">STEP 1</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Perangkat</th>
+          <th class="num">Qty</th>
+          <th class="num">Daya/unit</th>
+          <th class="num">Total Daya</th>
+          <th class="num">Jam/hari</th>
+          <th class="num">Energi/hari</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>💡 Lampu LED</td>
+          <td class="num">5 pcs</td>
+          <td class="num">10 W</td>
+          <td class="num highlight">50 W</td>
+          <td class="num">8 jam</td>
+          <td class="num highlight">400 Wh</td>
+        </tr>
+        <tr>
+          <td>🔌 Stop Kontak (Cas HP)</td>
+          <td class="num">3 pcs</td>
+          <td class="num">10 W</td>
+          <td class="num highlight">30 W</td>
+          <td class="num">5 jam</td>
+          <td class="num highlight">150 Wh</td>
+        </tr>
+        <tr>
+          <td>❄️ AC ½ PK</td>
+          <td class="num">1 unit</td>
+          <td class="num">300 W</td>
+          <td class="num highlight">300 W</td>
+          <td class="num">6 jam</td>
+          <td class="num highlight">1.800 Wh</td>
+        </tr>
+        <tr>
+          <td>🚰 Pompa Air</td>
+          <td class="num">1 unit</td>
+          <td class="num">150 W</td>
+          <td class="num highlight">150 W</td>
+          <td class="num">3 jam</td>
+          <td class="num highlight">450 Wh</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="tfoot">
+          <td><b>TOTAL</b></td>
+          <td></td>
+          <td></td>
+          <td class="num"><b>530 W</b></td>
+          <td></td>
+          <td class="num"><b>2.800 Wh/hari</b></td>
+        </tr>
+      </tfoot>
+    </table>
+    <div style="padding:12px 20px; background:rgba(0,0,0,0.15); font-size:12px; color:var(--text-dim);">
+      ⚠ AC ½ PK dihitung <b style="color:var(--text)">300W</b> (nilai realistis saat operasi normal). Total daya beban: <b style="color:var(--sol)">530W</b> (di bawah kapasitas inverter yang direkomendasikan).
+    </div>
+  </div>
+
+  <!-- BAGIAN 2: ASUMSI -->
+  <div class="sec-title">02 · Asumsi Perhitungan</div>
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-head">
+      <span class="label">PARAMETER SISTEM</span>
+      <span class="badge">OFF-GRID · 24V</span>
+    </div>
+    <div class="asumsi-grid">
+      <div class="asumsi-item">
+        <div class="key">TEGANGAN SISTEM</div>
+        <div class="val">24 <span class="unit">VDC</span></div>
+      </div>
+      <div class="asumsi-item">
+        <div class="key">ENERGI HARIAN</div>
+        <div class="val">2.800 <span class="unit">Wh</span></div>
+      </div>
+      <div class="asumsi-item">
+        <div class="key">PUNCAK MATAHARI (PSH)</div>
+        <div class="val">5 <span class="unit">jam/hari</span></div>
+      </div>
+      <div class="asumsi-item">
+        <div class="key">EFISIENSI SISTEM</div>
+        <div class="val">80 <span class="unit">%</span></div>
+      </div>
+      <div class="asumsi-item">
+        <div class="key">HARI OTONOMI BATERAI</div>
+        <div class="val">1.5 <span class="unit">hari</span></div>
+      </div>
+      <div class="asumsi-item">
+        <div class="key">DOD BATERAI</div>
+        <div class="val">80 <span class="unit">%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAGIAN 3: SPESIFIKASI KOMPONEN -->
+  <div class="sec-title">03 · Spesifikasi Komponen Utama</div>
+  <div class="spec-grid">
+
+    <!-- PANEL SURYA -->
+    <div class="spec-card sol">
+      <div class="spec-card-head">
+        <div class="spec-icon">☀️</div>
+        <div>
+          <div class="spec-card-name">PANEL SURYA</div>
+          <div class="spec-card-sub">Monocrystalline / Polycrystalline</div>
+        </div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row">
+          <span class="sk">Kebutuhan energi/hari</span>
+          <span class="sv">2.800 Wh</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Koreksi efisiensi (÷0.8)</span>
+          <span class="sv">3.500 Wh</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Daya panel minimum (÷5 PSH)</span>
+          <span class="sv">700 Wp</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Pilihan panel per unit</span>
+          <span class="sv">200 Wp</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Jumlah panel</span>
+          <span class="sv main">4 panel (800 Wp)</span>
+        </div>
+        <div class="spec-result">
+          <div class="r-label">REKOMENDASI</div>
+          <div class="r-val">4× 200 Wp</div>
+          <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Seri 2 panel → 2 string paralel (24V)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BATERAI -->
+    <div class="spec-card bat">
+      <div class="spec-card-head">
+        <div class="spec-icon">🔋</div>
+        <div>
+          <div class="spec-card-name">BATERAI</div>
+          <div class="spec-card-sub">Deep Cycle AGM / LiFePO4</div>
+        </div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row">
+          <span class="sk">Energi × otonomi</span>
+          <span class="sv">4.200 Wh</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Koreksi DOD (÷0.8)</span>
+          <span class="sv">5.250 Wh</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Kapasitas minimum</span>
+          <span class="sv">5.250 ÷ 24V = <b>219 Ah</b></span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Pilihan baterai</span>
+          <span class="sv">200 Ah / 12V</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Konfigurasi</span>
+          <span class="sv main">2 unit seri (24V)</span>
+        </div>
+        <div class="spec-result">
+          <div class="r-label">REKOMENDASI</div>
+          <div class="r-val">2× 200 Ah 12V</div>
+          <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Seri → 24V · 200 Ah · 4.800 Wh efektif</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVERTER -->
+    <div class="spec-card inv">
+      <div class="spec-card-head">
+        <div class="spec-icon">⚡</div>
+        <div>
+          <div class="spec-card-name">INVERTER</div>
+          <div class="spec-card-sub">Pure Sine Wave 24V</div>
+        </div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row">
+          <span class="sk">Total beban aktual</span>
+          <span class="sv">530 W</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Safety factor 1.25×</span>
+          <span class="sv">662 W</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">AC wajib pure sine wave</span>
+          <span class="sv">✓ Inverter PSW</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Surge capacity (AC start)</span>
+          <span class="sv">min 2.000 W</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Input tegangan</span>
+          <span class="sv main">24V DC</span>
+        </div>
+        <div class="spec-result">
+          <div class="r-label">REKOMENDASI</div>
+          <div class="r-val">1.000 – 1.500 W</div>
+          <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Pure Sine Wave · 24V · output 220VAC</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOLAR CHARGE CONTROLLER -->
+    <div class="spec-card scc">
+      <div class="spec-card-head">
+        <div class="spec-icon">🔆</div>
+        <div>
+          <div class="spec-card-name">SOLAR CHARGE CTRL</div>
+          <div class="spec-card-sub">MPPT Controller</div>
+        </div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row">
+          <span class="sk">Total Wp panel</span>
+          <span class="sv">800 Wp</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Arus panel (800÷24V)</span>
+          <span class="sv">33.3 A</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Safety factor 1.25×</span>
+          <span class="sv">41.7 A</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Tegangan sistem</span>
+          <span class="sv">24V</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">VOC panel (2 seri)</span>
+          <span class="sv main">~86 Voc</span>
+        </div>
+        <div class="spec-result">
+          <div class="r-label">REKOMENDASI</div>
+          <div class="r-val">MPPT 50A / 24V</div>
+          <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Max PV input ≥100V · output 24V</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BAGIAN 4: KABEL & PROTEKSI -->
+  <div class="sec-title">04 · Kabel & Proteksi</div>
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-head">
+      <span class="label">SPESIFIKASI PENGKABELAN & PENGAMAN</span>
+      <span class="badge">STEP 4</span>
+    </div>
+    <div class="kabel-body">
+      <div class="kabel-row">
+        <div>
+          <div class="kabel-name">Kabel Panel ke SCC</div>
+          <div style="font-size:11px; color:var(--text-dim);">Arus maks ±20A per string</div>
+        </div>
+        <div class="kabel-spec">Kabel NYAF / PV1-F 4 mm² (Merah-Hitam)</div>
+      </div>
+      <div class="kabel-row">
+        <div>
+          <div class="kabel-name">Kabel SCC ke Baterai</div>
+          <div style="font-size:11px; color:var(--text-dim);">Arus maks ±50A</div>
+        </div>
+        <div class="kabel-spec">Kabel Tembaga Fleksibel 16 mm²</div>
+      </div>
+      <div class="kabel-row">
+        <div>
+          <div class="kabel-name">Kabel Baterai ke Inverter</div>
+          <div style="font-size:11px; color:var(--text-dim);">Arus maks ±63A (1.500W÷24V)</div>
+        </div>
+        <div class="kabel-spec">Kabel Aki Fleksibel 25–35 mm²</div>
+      </div>
+      <div class="kabel-row">
+        <div>
+          <div class="kabel-name">Kabel Output Inverter ke Beban</div>
+          <div style="font-size:11px; color:var(--text-dim);">220VAC · arus ±6A</div>
+        </div>
+        <div class="kabel-spec">NYM 3×2.5 mm² (Grounding wajib)</div>
+      </div>
+      <div class="kabel-row">
+        <div>
+          <div class="kabel-name">MCB / Sekring Baterai</div>
+          <div style="font-size:11px; color:var(--text-dim);">Proteksi hubung singkat baterai</div>
+        </div>
+        <div class="kabel-spec">Fuse 60A + DC Breaker 24V</div>
+      </div>
+      <div class="kabel-row">
+        <div>
+          <div class="kabel-name">MCB AC Output</div>
+          <div style="font-size:11px; color:var(--text-dim);">Proteksi beban AC</div>
+        </div>
+        <div class="kabel-spec">MCB 1P 10A (lampu/stop kontak) · MCB 2P 16A (AC, pompa)</div>
+      </div>
+      <div class="kabel-row">
+        <div>
+          <div class="kabel-name">Connector MC4</div>
+          <div style="font-size:11px; color:var(--text-dim);">Sambungan panel surya</div>
+        </div>
+        <div class="kabel-spec">MC4 Connector Pair (min 4 pasang)</div>
+      </div>
+      <div class="kabel-row" style="border-bottom:none">
+        <div>
+          <div class="kabel-name">Grounding / Pentanahan</div>
+          <div style="font-size:11px; color:var(--text-dim);">Keamanan sistem</div>
+        </div>
+        <div class="kabel-spec">Kabel BC 6 mm² + Rod Grounding</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BAGIAN 5: BILL OF MATERIAL -->
+  <div class="sec-title">05 · Bill of Material (BOM)</div>
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-head">
+      <span class="label">DAFTAR LENGKAP BAHAN & ALAT</span>
+      <span class="badge">STEP 5</span>
+    </div>
+    <table class="bom-table">
+      <thead>
+        <tr>
+          <th class="no">#</th>
+          <th>Nama Item</th>
+          <th class="num jumlah">Qty</th>
+          <th class="num satuan">Satuan</th>
+          <th>Spesifikasi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">1</td>
+          <td>Panel Surya <span class="item-cat cat-utama">UTAMA</span></td>
+          <td class="num">4</td>
+          <td class="num">pcs</td>
+          <td style="font-size:12px; color:var(--text-dim)">200 Wp Monocrystalline / Polycrystalline, Voc ±22V</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">2</td>
+          <td>Solar Charge Controller MPPT <span class="item-cat cat-utama">UTAMA</span></td>
+          <td class="num">1</td>
+          <td class="num">pcs</td>
+          <td style="font-size:12px; color:var(--text-dim)">50A / 24V, max PV input ≥100V, layar LCD</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">3</td>
+          <td>Inverter Pure Sine Wave <span class="item-cat cat-utama">UTAMA</span></td>
+          <td class="num">1</td>
+          <td class="num">pcs</td>
+          <td style="font-size:12px; color:var(--text-dim)">1.000–1.500W, input 24VDC, output 220VAC 50Hz</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">4</td>
+          <td>Baterai Deep Cycle <span class="item-cat cat-batt">BATERAI</span></td>
+          <td class="num">2</td>
+          <td class="num">pcs</td>
+          <td style="font-size:12px; color:var(--text-dim)">200 Ah / 12V AGM atau LiFePO4, deep cycle</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">5</td>
+          <td>Kabel PV1-F / NYAF Solar <span class="item-cat cat-kabel">KABEL</span></td>
+          <td class="num">20</td>
+          <td class="num">meter</td>
+          <td style="font-size:12px; color:var(--text-dim)">4 mm², tahan UV, merah & hitam (masing-masing 10m)</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">6</td>
+          <td>Kabel Fleksibel (SCC–Baterai) <span class="item-cat cat-kabel">KABEL</span></td>
+          <td class="num">3</td>
+          <td class="num">meter</td>
+          <td style="font-size:12px; color:var(--text-dim)">16 mm² tembaga fleksibel, + dan −</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">7</td>
+          <td>Kabel Aki (Baterai–Inverter) <span class="item-cat cat-kabel">KABEL</span></td>
+          <td class="num">2</td>
+          <td class="num">meter</td>
+          <td style="font-size:12px; color:var(--text-dim)">25–35 mm² tembaga fleksibel, + dan −</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">8</td>
+          <td>Kabel NYM Instalasi AC <span class="item-cat cat-kabel">KABEL</span></td>
+          <td class="num">15</td>
+          <td class="num">meter</td>
+          <td style="font-size:12px; color:var(--text-dim)">3×2.5 mm², untuk distribusi beban AC</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">9</td>
+          <td>Kabel BC Grounding <span class="item-cat cat-kabel">KABEL</span></td>
+          <td class="num">5</td>
+          <td class="num">meter</td>
+          <td style="font-size:12px; color:var(--text-dim)">6 mm² bare copper</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">10</td>
+          <td>MC4 Connector <span class="item-cat cat-acc">AKSESORI</span></td>
+          <td class="num">5</td>
+          <td class="num">pasang</td>
+          <td style="font-size:12px; color:var(--text-dim)">Untuk sambungan panel seri & paralel + cadangan</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">11</td>
+          <td>Fuse + Fuse Holder DC <span class="item-cat cat-acc">AKSESORI</span></td>
+          <td class="num">2</td>
+          <td class="num">set</td>
+          <td style="font-size:12px; color:var(--text-dim)">60A untuk jalur baterai, dengan holder waterproof</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">12</td>
+          <td>DC Circuit Breaker <span class="item-cat cat-acc">AKSESORI</span></td>
+          <td class="num">1</td>
+          <td class="num">pcs</td>
+          <td style="font-size:12px; color:var(--text-dim)">30–50A / 24VDC, antara panel dan SCC</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">13</td>
+          <td>MCB AC 1P <span class="item-cat cat-acc">AKSESORI</span></td>
+          <td class="num">2</td>
+          <td class="num">pcs</td>
+          <td style="font-size:12px; color:var(--text-dim)">10A, untuk grup lampu & stop kontak</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">14</td>
+          <td>MCB AC 2P <span class="item-cat cat-acc">AKSESORI</span></td>
+          <td class="num">2</td>
+          <td class="num">pcs</td>
+          <td style="font-size:12px; color:var(--text-dim)">16A, untuk AC dan pompa air</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">15</td>
+          <td>Box Panel / Enclosure <span class="item-cat cat-acc">AKSESORI</span></td>
+          <td class="num">1</td>
+          <td class="num">pcs</td>
+          <td style="font-size:12px; color:var(--text-dim)">Panel distribusi + dudukan SCC & MCB, IP54</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">16</td>
+          <td>Busbar / Terminal Block DC <span class="item-cat cat-acc">AKSESORI</span></td>
+          <td class="num">1</td>
+          <td class="num">set</td>
+          <td style="font-size:12px; color:var(--text-dim)">Positif & negatif, kapasitas ≥100A</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">17</td>
+          <td>Struktur Rangka Panel <span class="item-cat cat-lain">STRUKTUR</span></td>
+          <td class="num">1</td>
+          <td class="num">set</td>
+          <td style="font-size:12px; color:var(--text-dim)">Besi/alumunium untuk 4 panel, sudut 15–30°, anti karat</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">18</td>
+          <td>Baut & Mur Stainless <span class="item-cat cat-lain">STRUKTUR</span></td>
+          <td class="num">1</td>
+          <td class="num">set</td>
+          <td style="font-size:12px; color:var(--text-dim)">Untuk pemasangan panel ke rangka</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">19</td>
+          <td>Grounding Rod <span class="item-cat cat-lain">STRUKTUR</span></td>
+          <td class="num">1</td>
+          <td class="num">pcs</td>
+          <td style="font-size:12px; color:var(--text-dim)">Copper-clad 1.5–3m, untuk pentanahan sistem</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">20</td>
+          <td>Kabel Ties & Conduit PVC <span class="item-cat cat-lain">LAIN-LAIN</span></td>
+          <td class="num">1</td>
+          <td class="num">set</td>
+          <td style="font-size:12px; color:var(--text-dim)">Perapian kabel, conduit UV resistant</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">21</td>
+          <td>Voltmeter/Multimeter DC <span class="item-cat cat-lain">ALAT</span></td>
+          <td class="num">1</td>
+          <td class="num">pcs</td>
+          <td style="font-size:12px; color:var(--text-dim)">Untuk monitoring tegangan baterai & panel</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">22</td>
+          <td>Terminal Sepatu Kabel (Lug) <span class="item-cat cat-kabel">KABEL</span></td>
+          <td class="num">1</td>
+          <td class="num">set</td>
+          <td style="font-size:12px; color:var(--text-dim)">Berbagai ukuran sesuai penampang kabel</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CATATAN PENTING -->
+  <div class="notes">
+    <div class="n-title">⚠ CATATAN PENTING INSTALASI</div>
+    <ul>
+      <li>AC ½ PK bersifat <b>induktif</b> → wajib inverter <b>Pure Sine Wave</b>. Modified sine wave akan merusak AC dan pompa.</li>
+      <li>AC saat start (starting current) bisa 3–5× daya normal → pastikan inverter punya <b>surge capacity ≥ 2.000W</b>.</li>
+      <li>Jangan jalankan semua beban secara bersamaan. Total simultan maksimum ≤ kapasitas inverter.</li>
+      <li>Konfigurasi baterai: 2 unit 12V disambung <b>SERI</b> (+ ke − baterai 1 ke baterai 2) untuk mendapat 24V.</li>
+      <li>Konfigurasi panel: 2 panel seri (→ 44V) lalu 2 string paralel → input SCC ±44V, arus ±20A per string.</li>
+      <li>Pastikan instalasi dilakukan oleh <b>teknisi berpengalaman</b>. Sistem DC tegangan tinggi berbahaya.</li>
+      <li>Letakkan baterai di tempat berventilasi baik, jauh dari sumber api.</li>
+    </ul>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="sec-title">Ringkasan Sistem</div>
+  <div class="summary-bar">
+    <div class="sum-item">
+      <div class="s-label">PANEL SURYA</div>
+      <div class="s-val">800 <span class="s-unit">Wp</span></div>
+      <div style="font-size:11px; color:var(--text-dim)">4× 200 Wp</div>
+    </div>
+    <div class="sum-item">
+      <div class="s-label">KAPASITAS BATERAI</div>
+      <div class="s-val">4.800 <span class="s-unit">Wh</span></div>
+      <div style="font-size:11px; color:var(--text-dim)">2× 200Ah / 24V</div>
+    </div>
+    <div class="sum-item">
+      <div class="s-label">INVERTER</div>
+      <div class="s-val">1.500 <span class="s-unit">W</span></div>
+      <div style="font-size:11px; color:var(--text-dim)">Pure Sine Wave</div>
+    </div>
+    <div class="sum-item">
+      <div class="s-label">CHARGE CTRL</div>
+      <div class="s-val">50 <span class="s-unit">A</span></div>
+      <div style="font-size:11px; color:var(--text-dim)">MPPT / 24V</div>
+    </div>
+    <div class="sum-item">
+      <div class="s-label">TEGANGAN SISTEM</div>
+      <div class="s-val">24 <span class="s-unit">V</span></div>
+      <div style="font-size:11px; color:var(--text-dim)">DC Off-Grid</div>
+    </div>
+    <div class="sum-item">
+      <div class="s-label">TOTAL BEBAN</div>
+      <div class="s-val">530 <span class="s-unit">W</span></div>
+      <div style="font-size:11px; color:var(--text-dim)">2.800 Wh/hari</div>
+    </div>
+  </div>
+
+  <div class="footer">SOLAR CELL SYSTEM CALCULATOR · OFF-GRID 24V · 2025 · GENERATED FOR 530W LOAD</div>
+</div>
+</body>
+</html>
