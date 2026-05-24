@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyek Jaringan WiFi — 3 Desa Terpencil</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Barlow:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pri: #3b82f6;
+    --pri-light: #93c5fd;
+    --pri-dark: #1d4ed8;
+    --green: #10b981;
+    --green-light: #6ee7b7;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --bg: #0A0E14;
+    --bg2: #111620;
+    --bg3: #1A2030;
+    --border: #2A3550;
+    --text: #C8D8F0;
+    --text-dim: #6A7A9A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Animated signal pulse background */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 20%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,130,246,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: pulse-bg 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse-bg {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+  }
+
+  /* ── BACK BUTTON ── */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-decoration: none;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    transition: all 0.2s;
+  }
+  .back-btn:hover { color: var(--pri-light); border-color: rgba(59,130,246,0.4); }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    overflow: hidden;
+    padding: 40px 32px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.02));
+    border: 1px solid rgba(59,130,246,0.3);
+    border-radius: 4px;
+    margin-bottom: 32px;
+  }
+  .header::before {
+    content: '📡';
+    position: absolute;
+    top: -20px; right: -10px;
+    font-size: 160px;
+    opacity: 0.04;
+    line-height: 1;
+  }
+
+  /* Signal rings decoration */
+  .signal-rings {
+    position: absolute;
+    right: 40px; top: 50%;
+    transform: translateY(-50%);
+    width: 120px; height: 120px;
+    display: none;
+  }
+  @media (min-width: 640px) { .signal-rings { display: block; } }
+  .ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(59,130,246,0.25);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    animation: ring-pulse 2.5s ease-out infinite;
+  }
+  .ring:nth-child(1) { width: 30px; height: 30px; animation-delay: 0s; }
+  .ring:nth-child(2) { width: 60px; height: 60px; animation-delay: 0.5s; }
+  .ring:nth-child(3) { width: 90px; height: 90px; animation-delay: 1s; }
+  .ring:nth-child(4) { width: 120px; height: 120px; animation-delay: 1.5s; }
+  @keyframes ring-pulse {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    50% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+  }
+  .ring-dot {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--pri);
+    box-shadow: 0 0 12px var(--pri);
+  }
+
+  .header-tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--pri);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .header h1 span { color: var(--pri-light); }
+  .header p {
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 300;
+    max-width: 520px;
+    line-height: 1.7;
+  }
+
+  .tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .tag-blue { background: rgba(59,130,246,0.12); color: var(--pri-light); border: 1px solid rgba(59,130,246,0.3); }
+  .tag-green { background: rgba(16,185,129,0.1); color: var(--green-light); border: 1px solid rgba(16,185,129,0.25); }
+  .tag-amber { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+
+  /* ── SECTION TITLE ── */
+  .sec-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--pri-light);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sec-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .card-head {
+    background: var(--bg3);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .card-head .label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    background: rgba(59,130,246,0.15);
+    color: var(--pri-light);
+    border: 1px solid rgba(59,130,246,0.3);
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .badge-green {
+    background: rgba(16,185,129,0.12);
+    color: var(--green-light);
+    border-color: rgba(16,185,129,0.3);
+  }
+
+  /* ── LOKASI DESA CARDS ── */
+  .desa-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    padding: 20px;
+  }
+  .desa-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .desa-card:hover { border-color: rgba(59,130,246,0.4); transform: translateY(-3px); }
+  .desa-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pri-dark), var(--pri));
+  }
+  .desa-card:nth-child(2)::before { background: linear-gradient(90deg, #065f46, var(--green)); }
+  .desa-card:nth-child(3)::before { background: linear-gradient(90deg, #92400e, var(--amber)); }
+
+  .desa-head {
+    padding: 16px 18px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .desa-num {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--pri);
+    line-height: 1;
+    min-width: 36px;
+  }
+  .desa-card:nth-child(2) .desa-num { color: var(--green); }
+  .desa-card:nth-child(3) .desa-num { color: var(--amber); }
+  .desa-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+  }
+  .desa-label { font-size: 11px; color: var(--text-dim); }
+
+  .desa-body { padding: 14px 18px; }
+  .desa-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(42,53,80,0.4);
+    font-size: 13px;
+  }
+  .desa-row:last-child { border-bottom: none; }
+  .desa-row .dk { color: var(--text-dim); }
+  .desa-row .dv {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .status-online {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+  }
+  .status-online::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ── TOPOLOGY DIAGRAM ── */
+  .topology-wrap {
+    padding: 24px 20px;
+    overflow-x: auto;
+  }
+  .topology {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    min-width: 600px;
+    flex-wrap: nowrap;
+  }
+  .topo-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-width: 90px;
+  }
+  .topo-box {
+    width: 72px; height: 72px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .topo-box:hover { border-color: rgba(59,130,246,0.5); }
+  .topo-box.internet { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.08); }
+  .topo-box.starlink { border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.06); }
+  .topo-box.router { border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.06); }
+  .topo-box.ap { border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.05); }
+  .topo-box.desa { border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); }
+
+  .topo-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .topo-sublabel {
+    font-size: 9px;
+    color: rgba(106,122,154,0.6);
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .topo-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(59,130,246,0.5), rgba(59,130,246,0.2));
+    position: relative;
+    min-width: 30px;
+    margin-top: -40px;
+  }
+  .topo-line::after {
+    content: '';
+    position: absolute;
+    top: 50%; right: -6px;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-left: 6px solid rgba(59,130,246,0.5);
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+  }
+  .topo-line-label {
+    position: absolute;
+    top: -18px; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: rgba(59,130,246,0.6);
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+
+  .topo-branch {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: -40px;
+    align-items: flex-start;
+  }
+  .topo-branch-item {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .topo-branch-line {
+    width: 30px; height: 2px;
+    background: rgba(59,130,246,0.3);
+    position: relative;
+  }
+  .topo-branch-line::after {
+    content: '';
+    position: absolute;
+    top: 50%; right: -5px;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid rgba(59,130,246,0.3);
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+  }
+
+  /* ── PERANGKAT TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    padding: 10px 20px;
+    text-align: left;
+    background: rgba(0,0,0,0.2);
+    border-bottom: 1px solid var(--border);
+  }
+  th.num { text-align: right; }
+  td {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(42,53,80,0.5);
+    font-size: 14px;
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(59,130,246,0.03); }
+  td.num { text-align: right; font-family: 'Share Tech Mono', monospace; font-size: 13px; }
+  td.hl { color: var(--pri-light); font-family: 'Share Tech Mono', monospace; font-weight: 600; }
+  .tfoot td {
+    background: rgba(59,130,246,0.06);
+    border-top: 1px solid rgba(59,130,246,0.2);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--pri-light);
+  }
+
+  .dev-cat {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 7px;
+    border-radius: 2px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .cat-starlink { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+  .cat-ruijie { background: rgba(16,185,129,0.1); color: var(--green-light); border: 1px solid rgba(16,185,129,0.25); }
+  .cat-net { background: rgba(59,130,246,0.1); color: var(--pri-light); border: 1px solid rgba(59,130,246,0.25); }
+  .cat-power { background: rgba(171,71,188,0.1); color: #d8b4fe; border: 1px solid rgba(171,71,188,0.25); }
+  .cat-acc { background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid var(--border); }
+
+  /* ── KONFIGURASI STEPS ── */
+  .config-steps {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .config-step {
+    display: flex;
+    gap: 16px;
+    position: relative;
+    padding-bottom: 20px;
+  }
+  .config-step:last-child { padding-bottom: 0; }
+  .step-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(59,130,246,0.15);
+    border: 1px solid rgba(59,130,246,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--pri-light);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .step-line {
+    width: 1px;
+    flex: 1;
+    background: linear-gradient(to bottom, rgba(59,130,246,0.4), transparent);
+    margin-top: 4px;
+  }
+  .config-step:last-child .step-line { display: none; }
+  .step-content { padding-top: 4px; flex: 1; }
+  .step-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .step-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+  .step-desc code {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    background: rgba(59,130,246,0.1);
+    color: var(--pri-light);
+    padding: 1px 6px;
+    border-radius: 2px;
+    border: 1px solid rgba(59,130,246,0.2);
+  }
+
+  /* ── NOTES ── */
+  .notes {
+    background: rgba(239,68,68,0.05);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-left: 3px solid var(--red);
+    padding: 16px 20px;
+    border-radius: 3px;
+    margin-bottom: 24px;
+  }
+  .notes .n-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fca5a5;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  .notes ul { list-style: none; }
+  .notes ul li {
+    font-size: 13px;
+    color: var(--text-dim);
+    padding: 4px 0;
+    padding-left: 16px;
+    position: relative;
+  }
+  .notes ul li::before { content: '▸'; position: absolute; left: 0; color: var(--red); opacity: 0.6; }
+
+  .tips {
+    background: rgba(16,185,129,0.05);
+    border: 1px solid rgba(16,185,129,0.2);
+    border-left: 3px solid var(--green);
+    padding: 16px 20px;
+    border-radius: 3px;
+    margin-bottom: 24px;
+  }
+  .tips .n-title { color: var(--green-light); }
+  .tips ul li::before { color: var(--green); }
+
+  /* ── SUMMARY ── */
+  .summary-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .sum-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .sum-item:hover { border-color: rgba(59,130,246,0.35); }
+  .sum-item .s-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .sum-item .s-val {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--pri-light);
+  }
+  .sum-item .s-unit { font-size: 13px; color: var(--text-dim); }
+
+  /* ── SPEC GRID ── */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .spec-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .spec-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .spec-card.starlink::before { background: linear-gradient(90deg, #92400e, var(--amber)); }
+  .spec-card.ruijie-r::before { background: linear-gradient(90deg, #065f46, var(--green)); }
+  .spec-card.ruijie-sw::before { background: linear-gradient(90deg, #1d4ed8, var(--pri)); }
+  .spec-card.mikrotik::before { background: linear-gradient(90deg, #6b21a8, #a855f7); }
+  .spec-card-head {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .spec-icon {
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .spec-card-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #fff;
+  }
+  .spec-card-sub { font-size: 11px; color: var(--text-dim); }
+  .spec-body { padding: 16px 20px; }
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(42,53,80,0.4);
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-row .sk { font-size: 13px; color: var(--text-dim); }
+  .spec-row .sv {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--text);
+    text-align: right;
+  }
+  .spec-row .sv.main { font-size: 14px; color: var(--pri-light); font-weight: bold; }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 12px;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 600px) {
+    .spec-grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 22px; }
+    .summary-bar { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- BACK -->
+  <a href="index.html" class="back-btn">← KEMBALI KE PORTFOLIO</a>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="signal-rings">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring-dot"></div>
+    </div>
+    <div class="header-tag">📡 Infrastruktur Jaringan — Remote Area</div>
+    <h1>JARINGAN WiFi <span>3 DESA TERPENCIL</span></h1>
+    <p>
+      Proyek pemasangan dan konfigurasi jaringan WiFi jarak jauh menggunakan teknologi
+      Starlink sebagai sumber internet utama, dikombinasikan dengan perangkat Ruijie dan
+      peralatan jaringan pendukung. Berhasil menghubungkan 3 desa terpencil dengan
+      layanan internet yang andal melalui konfigurasi remote.
+    </p>
+    <div class="tags-row">
+      <span class="tag tag-amber">Starlink</span>
+      <span class="tag tag-green">Ruijie</span>
+      <span class="tag tag-blue">Remote Configuration</span>
+      <span class="tag tag-blue">Network Planning</span>
+      <span class="tag tag-green">Wireless Infrastructure</span>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="sec-title">00 · Ringkasan Proyek</div>
+  <div class="summary-bar">
+    <div class="sum-item">
+      <div class="s-label">DESA TERHUBUNG</div>
+      <div class="s-val">3 <span class="s-unit">Desa</span></div>
+      <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Remote Area</div>
+    </div>
+    <div class="sum-item">
+      <div class="s-label">TEKNOLOGI ISP</div>
+      <div class="s-val" style="font-size:18px;">Starlink</div>
+      <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Satellite Internet</div>
+    </div>
+    <div class="sum-item">
+      <div class="s-label">ACCESS POINT</div>
+      <div class="s-val">6 <span class="s-unit">Unit</span></div>
+      <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Ruijie AP</div>
+    </div>
+    <div class="sum-item">
+      <div class="s-label">KECEPATAN</div>
+      <div class="s-val">100<span class="s-unit">+</span></div>
+      <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Mbps Download</div>
+    </div>
+    <div class="sum-item">
+      <div class="s-label">METODE DEPLOY</div>
+      <div class="s-val" style="font-size:16px;">Remote</div>
+      <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Config & Monitor</div>
+    </div>
+    <div class="sum-item">
+      <div class="s-label">STATUS</div>
+      <div class="s-val" style="font-size:16px; color:var(--green)">Online</div>
+      <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Aktif & Stabil</div>
+    </div>
+  </div>
+
+  <!-- LOKASI DESA -->
+  <div class="sec-title">01 · Lokasi Deployment</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">TIGA DESA TERPENCIL — AREA LAYANAN</span>
+      <span class="badge badge-green">● 3/3 ONLINE</span>
+    </div>
+    <div class="desa-grid">
+
+      <div class="desa-card">
+        <div class="desa-head">
+          <div class="desa-num">01</div>
+          <div>
+            <div class="desa-name">📍 DESA AIR PAPAYA</div>
+            <div class="desa-label">Lokasi 1 · Node Utama</div>
+          </div>
+        </div>
+        <div class="desa-body">
+          <div class="desa-row">
+            <span class="dk">Status</span>
+            <span class="dv"><span class="status-online">ONLINE</span></span>
+          </div>
+          <div class="desa-row">
+            <span class="dk">Perangkat</span>
+            <span class="dv">Starlink + Router Ruijie</span>
+          </div>
+          <div class="desa-row">
+            <span class="dk">Akses Point</span>
+            <span class="dv">2× Ruijie AP</span>
+          </div>
+          <div class="desa-row">
+            <span class="dk">Cakupan</span>
+            <span class="dv">Area Desa + Sekitar</span>
+          </div>
+          <div class="desa-row">
+            <span class="dk">Konfigurasi</span>
+            <span class="dv">Remote via Cloud</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="desa-card">
+        <div class="desa-head">
+          <div class="desa-num">02</div>
+          <div>
+            <div class="desa-name">📍 DESA GORONG</div>
+            <div class="desa-label">Lokasi 2 · Node Sekunder</div>
+          </div>
+        </div>
+        <div class="desa-body">
+          <div class="desa-row">
+            <span class="dk">Status</span>
+            <span class="dv"><span class="status-online">ONLINE</span></span>
+          </div>
+          <div class="desa-row">
+            <span class="dk">Perangkat</span>
+            <span class="dv">Starlink + Router Ruijie</span>
+          </div>
+          <div class="desa-row">
+            <span class="dk">Akses Point</span>
+            <span class="dv">2× Ruijie AP</span>
+          </div>
+          <div class="desa-row">
+            <span class="dk">Cakupan</span>
+            <span class="dv">Area Desa + Sekitar</span>
+          </div>
+          <div class="desa-row">
+            <span class="dk">Konfigurasi</span>
+            <span class="dv">Remote via Cloud</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="desa-card">
+        <div class="desa-head">
+          <div class="desa-num">03</div>
+          <div>
+            <div class="desa-name">📍 DESA TAPINALU</div>
+            <div class="desa-label">Lokasi 3 · Node Sekunder</div>
+          </div>
+        </div>
+        <div class="desa-body">
+          <div class="desa-row">
+            <span class="dk">Status</span>
+            <span class="dv"><span class="status-online">ONLINE</span></span>
+          </div>
+          <div class="desa-row">
+            <span class="dk">Perangkat</span>
+            <span class="dv">Starlink + Router Ruijie</span>
+          </div>
+          <div class="desa-row">
+            <span class="dk">Akses Point</span>
+            <span class="dv">2× Ruijie AP</span>
+          </div>
+          <div class="desa-row">
+            <span class="dk">Cakupan</span>
+            <span class="dv">Area Desa + Sekitar</span>
+          </div>
+          <div class="desa-row">
+            <span class="dk">Konfigurasi</span>
+            <span class="dv">Remote via Cloud</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOPOLOGI JARINGAN -->
+  <div class="sec-title">02 · Topologi Jaringan</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">DIAGRAM ARSITEKTUR JARINGAN</span>
+      <span class="badge">PER LOKASI DESA</span>
+    </div>
+    <div class="topology-wrap">
+      <div class="topology">
+        <div class="topo-node">
+          <div class="topo-box internet">🌐</div>
+          <div class="topo-label">INTERNET<br>SATELIT</div>
+          <div class="topo-sublabel">LEO Orbit</div>
+        </div>
+        <div class="topo-line" style="flex:0.8;">
+          <div class="topo-line-label">RF Link</div>
+        </div>
+        <div class="topo-node">
+          <div class="topo-box starlink">🛸</div>
+          <div class="topo-label">STARLINK<br>DISH</div>
+          <div class="topo-sublabel">Input ISP</div>
+        </div>
+        <div class="topo-line">
+          <div class="topo-line-label">Ethernet</div>
+        </div>
+        <div class="topo-node">
+          <div class="topo-box router">🔧</div>
+          <div class="topo-label">RUIJIE<br>ROUTER</div>
+          <div class="topo-sublabel">Gateway</div>
+        </div>
+        <div class="topo-line">
+          <div class="topo-line-label">LAN / PoE</div>
+        </div>
+        <div class="topo-node">
+          <div class="topo-box ap">📶</div>
+          <div class="topo-label">RUIJIE<br>ACCESS POINT</div>
+          <div class="topo-sublabel">2× per Desa</div>
+        </div>
+        <div class="topo-line">
+          <div class="topo-line-label">WiFi 2.4/5GHz</div>
+        </div>
+        <div class="topo-node">
+          <div class="topo-box desa">👥</div>
+          <div class="topo-label">USER<br>DESA</div>
+          <div class="topo-sublabel">Warga</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; padding: 12px 16px; background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.15); border-radius:4px;">
+        <div style="font-family:'Share Tech Mono',monospace; font-size:10px; color:var(--pri-light); letter-spacing:1px; margin-bottom:8px;">CLOUD MANAGEMENT LAYER</div>
+        <div style="font-size:13px; color:var(--text-dim); line-height:1.7;">
+          Seluruh perangkat Ruijie (Router + Access Point) di 3 desa dikelola secara terpusat melalui
+          <strong style="color:var(--text)">Ruijie Cloud / Reyee</strong> —
+          memungkinkan konfigurasi, monitoring, update firmware, dan troubleshooting dilakukan
+          <strong style="color:var(--pri-light)">100% Remote</strong> tanpa harus hadir di lokasi.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPESIFIKASI PERANGKAT -->
+  <div class="sec-title">03 · Spesifikasi Perangkat Utama</div>
+  <div class="spec-grid">
+
+    <div class="spec-card starlink">
+      <div class="spec-card-head">
+        <div class="spec-icon">🛸</div>
+        <div>
+          <div class="spec-card-name">STARLINK</div>
+          <div class="spec-card-sub">Satellite Internet · SpaceX LEO</div>
+        </div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row">
+          <span class="sk">Teknologi</span>
+          <span class="sv main">Low Earth Orbit</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Download Speed</span>
+          <span class="sv">100 – 200 Mbps</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Upload Speed</span>
+          <span class="sv">10 – 20 Mbps</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Latency</span>
+          <span class="sv">25 – 60 ms</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Koneksi ke Router</span>
+          <span class="sv">Ethernet / PoE</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Keunggulan</span>
+          <span class="sv">Coverage Remote Area</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-card ruijie-r">
+      <div class="spec-card-head">
+        <div class="spec-icon">🔧</div>
+        <div>
+          <div class="spec-card-name">RUIJIE ROUTER</div>
+          <div class="spec-card-sub">Gateway · Reyee Series</div>
+        </div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row">
+          <span class="sk">Fungsi</span>
+          <span class="sv main">Router / Gateway</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">WAN Input</span>
+          <span class="sv">Starlink via Ethernet</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">LAN Port</span>
+          <span class="sv">4× Gigabit RJ45</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Manajemen</span>
+          <span class="sv">Ruijie Cloud (Remote)</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">DHCP / NAT</span>
+          <span class="sv">✔ Supported</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Bandwidth Ctrl</span>
+          <span class="sv">✔ Per User Limit</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-card ruijie-sw">
+      <div class="spec-card-head">
+        <div class="spec-icon">📶</div>
+        <div>
+          <div class="spec-card-name">RUIJIE ACCESS POINT</div>
+          <div class="spec-card-sub">Indoor / Outdoor AP · Reyee</div>
+        </div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row">
+          <span class="sk">WiFi Standard</span>
+          <span class="sv main">Wi-Fi 6 / 802.11ax</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Frekuensi</span>
+          <span class="sv">2.4 GHz + 5 GHz</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Max Speed</span>
+          <span class="sv">1800 Mbps</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Power</span>
+          <span class="sv">PoE 802.3af/at</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Max Client</span>
+          <span class="sv">128+ per AP</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Manajemen</span>
+          <span class="sv">Reyee Cloud / App</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-card mikrotik">
+      <div class="spec-card-head">
+        <div class="spec-icon">🔌</div>
+        <div>
+          <div class="spec-card-name">POWER SUPPLY</div>
+          <div class="spec-card-sub">PoE Injector / UPS Backup</div>
+        </div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row">
+          <span class="sk">PoE Injector</span>
+          <span class="sv main">48V Passive / 802.3at</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">UPS/Battery</span>
+          <span class="sv">Backup Power (opsional)</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Input Voltase</span>
+          <span class="sv">220 VAC / 50Hz</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Proteksi</span>
+          <span class="sv">Surge Protection</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Grounding</span>
+          <span class="sv">Wajib (Lightning Rod)</span>
+        </div>
+        <div class="spec-row">
+          <span class="sk">Enclosure</span>
+          <span class="sv">Weatherproof IP65</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOM / DAFTAR PERANGKAT -->
+  <div class="sec-title">04 · Bill of Material</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">DAFTAR PERANGKAT & MATERIAL (PER 3 LOKASI)</span>
+      <span class="badge">TOTAL KEBUTUHAN</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40px;">#</th>
+          <th>Nama Perangkat / Material</th>
+          <th class="num" style="width:60px;">Qty</th>
+          <th class="num" style="width:70px;">Satuan</th>
+          <th>Keterangan</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">1</td>
+          <td>Starlink Standard Kit <span class="dev-cat cat-starlink">STARLINK</span></td>
+          <td class="num">3</td>
+          <td class="num">unit</td>
+          <td style="font-size:12px; color:var(--text-dim)">Dish + Router Starlink bawaan, 1 unit per desa</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">2</td>
+          <td>Ruijie Reyee Router (RG-EG Series) <span class="dev-cat cat-ruijie">RUIJIE</span></td>
+          <td class="num">3</td>
+          <td class="num">unit</td>
+          <td style="font-size:12px; color:var(--text-dim)">Gateway utama per desa, manageable via cloud</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">3</td>
+          <td>Ruijie Reyee Access Point (RG-AP) <span class="dev-cat cat-ruijie">RUIJIE</span></td>
+          <td class="num">6</td>
+          <td class="num">unit</td>
+          <td style="font-size:12px; color:var(--text-dim)">2 unit per desa, indoor/outdoor, Wi-Fi 6</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">4</td>
+          <td>PoE Switch / PoE Injector <span class="dev-cat cat-net">JARINGAN</span></td>
+          <td class="num">3</td>
+          <td class="num">unit</td>
+          <td style="font-size:12px; color:var(--text-dim)">Untuk power AP via kabel LAN, per lokasi</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">5</td>
+          <td>Kabel UTP Cat6 Outdoor <span class="dev-cat cat-net">JARINGAN</span></td>
+          <td class="num">150</td>
+          <td class="num">meter</td>
+          <td style="font-size:12px; color:var(--text-dim)">Tahan cuaca, UV-resistant, per 50m per desa</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">6</td>
+          <td>RJ45 Connector + Boot <span class="dev-cat cat-net">JARINGAN</span></td>
+          <td class="num">30</td>
+          <td class="num">pcs</td>
+          <td style="font-size:12px; color:var(--text-dim)">Crimping ujung kabel, cadangan extra</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">7</td>
+          <td>Panel Box Outdoor IP65 <span class="dev-cat cat-power">PANEL</span></td>
+          <td class="num">3</td>
+          <td class="num">unit</td>
+          <td style="font-size:12px; color:var(--text-dim)">Tempat router, PoE, dan terminal, 1 per lokasi</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">8</td>
+          <td>Surge Protector / Arrester <span class="dev-cat cat-power">PANEL</span></td>
+          <td class="num">3</td>
+          <td class="num">unit</td>
+          <td style="font-size:12px; color:var(--text-dim)">Proteksi petir pada jalur LAN dan listrik</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">9</td>
+          <td>MCB + Kabel Listrik NYM <span class="dev-cat cat-power">PANEL</span></td>
+          <td class="num">3</td>
+          <td class="num">set</td>
+          <td style="font-size:12px; color:var(--text-dim)">Distribusi daya ke perangkat, per lokasi</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">10</td>
+          <td>Tiang / Mounting Antena <span class="dev-cat cat-acc">STRUKTUR</span></td>
+          <td class="num">6</td>
+          <td class="num">unit</td>
+          <td style="font-size:12px; color:var(--text-dim)">Bracket/tiang untuk AP outdoor, 2 per desa</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">11</td>
+          <td>Grounding Rod + Kabel BC <span class="dev-cat cat-power">PANEL</span></td>
+          <td class="num">3</td>
+          <td class="num">set</td>
+          <td style="font-size:12px; color:var(--text-dim)">Pentanahan sistem, wajib per lokasi</td>
+        </tr>
+        <tr>
+          <td class="num" style="color:var(--text-dim)">12</td>
+          <td>Cable Ties + Conduit + Clamp <span class="dev-cat cat-acc">AKSESORI</span></td>
+          <td class="num">3</td>
+          <td class="num">set</td>
+          <td style="font-size:12px; color:var(--text-dim)">Perapian dan proteksi kabel</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="tfoot">
+          <td colspan="2"><b>TOTAL PERANGKAT UTAMA</b></td>
+          <td class="num" colspan="3"><b>12 Jenis Item · 3 Lokasi Terpencil</b></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- LANGKAH KONFIGURASI -->
+  <div class="sec-title">05 · Tahapan Konfigurasi Remote</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">REMOTE CONFIGURATION & DEPLOYMENT WORKFLOW</span>
+      <span class="badge">STEP BY STEP</span>
+    </div>
+    <div class="config-steps">
+
+      <div class="config-step">
+        <div class="step-left">
+          <div class="step-num">1</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">PERSIAPAN & SURVEY LOKASI</div>
+          <div class="step-desc">
+            Survey kondisi lapangan: cek sinyal Starlink (<code>obstruction map</code>), identifikasi titik optimal pemasangan dish,
+            ukur jarak antar titik AP, dan rencanakan jalur kabel. Pastikan tersedia sumber listrik di setiap lokasi desa.
+          </div>
+        </div>
+      </div>
+
+      <div class="config-step">
+        <div class="step-left">
+          <div class="step-num">2</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">AKTIVASI STARLINK</div>
+          <div class="step-desc">
+            Pasang dish Starlink pada posisi tanpa hambatan langit (obstruction &lt; 2%). Aktifkan melalui
+            aplikasi <code>Starlink App</code>, lakukan registrasi akun, dan verifikasi koneksi satelit.
+            Sambungkan output Starlink ke WAN port Router Ruijie menggunakan kabel Ethernet.
+          </div>
+        </div>
+      </div>
+
+      <div class="config-step">
+        <div class="step-left">
+          <div class="step-num">3</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">KONFIGURASI ROUTER RUIJIE — CLOUD ONBOARDING</div>
+          <div class="step-desc">
+            Power on Router Ruijie → buka <code>app.ruijienetworks.com</code> atau Reyee App.
+            Tambahkan perangkat menggunakan <code>SN (Serial Number)</code> router.
+            Atur SSID WiFi, password, DHCP range, dan bandwidth per user dari dashboard cloud.
+            Semua konfigurasi push secara remote tanpa perlu akses fisik ke perangkat.
+          </div>
+        </div>
+      </div>
+
+      <div class="config-step">
+        <div class="step-left">
+          <div class="step-num">4</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">PEMASANGAN & ADOPSI ACCESS POINT</div>
+          <div class="step-desc">
+            Pasang Access Point Ruijie di titik optimal (ketinggian 3–5m). Sambungkan via kabel
+            <code>UTP Cat6</code> ke PoE Switch / Injector. AP akan otomatis terdaftar ke Router Ruijie
+            dan muncul di dashboard Reyee Cloud. Lakukan adoptasi (<code>Adopt</code>) dan AP langsung aktif
+            dengan konfigurasi yang sudah diset di router.
+          </div>
+        </div>
+      </div>
+
+      <div class="config-step">
+        <div class="step-left">
+          <div class="step-num">5</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">PENGUJIAN & VERIFIKASI JARINGAN</div>
+          <div class="step-desc">
+            Uji koneksi dari perangkat user: speed test via <code>fast.com</code> atau <code>speedtest.net</code>,
+            ping test ke server eksternal, dan verifikasi coverage WiFi di seluruh area desa.
+            Pantau jumlah client terhubung dan kualitas sinyal dari dashboard Reyee Cloud secara real-time.
+          </div>
+        </div>
+      </div>
+
+      <div class="config-step">
+        <div class="step-left">
+          <div class="step-num">6</div>
+        </div>
+        <div class="step-content">
+          <div class="step-title">MONITORING & REMOTE MANAGEMENT BERKELANJUTAN</div>
+          <div class="step-desc">
+            Pantau status semua perangkat di 3 desa melalui <code>Reyee Cloud Dashboard</code> secara berkala.
+            Notifikasi otomatis dikirim jika ada perangkat offline. Update firmware perangkat dilakukan remote.
+            Troubleshooting dan perubahan konfigurasi dapat dilakukan kapan saja tanpa perlu ke lokasi.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="tips">
+    <div class="n-title">✅ KEUNGGULAN SOLUSI INI</div>
+    <ul>
+      <li>Starlink menjangkau area terpencil yang tidak dapat dilayani ISP konvensional (fiber/kabel).</li>
+      <li>Ruijie Reyee memiliki ekosistem cloud management terintegrasi — 1 dashboard untuk semua lokasi.</li>
+      <li>Konfigurasi 100% remote menghemat biaya perjalanan berulang ke desa-desa terpencil.</li>
+      <li>Access Point Ruijie mendukung roaming seamless antar AP dalam satu jaringan yang sama.</li>
+      <li>Bandwidth control per user mencegah monopoli bandwidth oleh satu pengguna.</li>
+    </ul>
+  </div>
+
+  <!-- CATATAN PENTING -->
+  <div class="notes">
+    <div class="n-title">⚠ CATATAN PENTING INSTALASI</div>
+    <ul>
+      <li>Dish Starlink <b>wajib</b> dipasang di tempat tanpa halangan langit — pohon, atap, atau bangunan tinggi mengurangi kualitas sinyal drastis.</li>
+      <li>Gunakan kabel UTP <b>outdoor/weatherproof</b> untuk instalasi luar ruangan agar tidak rusak akibat cuaca dan UV.</li>
+      <li>Pasang <b>surge protector / lightning arrester</b> pada jalur LAN dan listrik untuk melindungi perangkat dari sambaran petir.</li>
+      <li>Pastikan sistem <b>grounding</b> terpasang dengan benar pada setiap lokasi — daerah terpencil rentan petir.</li>
+      <li>Simpan catatan <b>SN (Serial Number)</b> setiap perangkat untuk memudahkan re-adoption jika ada penggantian perangkat.</li>
+      <li>Dokumentasikan password WiFi dan akun Reyee Cloud dengan baik dan simpan di tempat aman.</li>
+    </ul>
+  </div>
+
+  <div class="footer">PROYEK JARINGAN WiFi DESA TERPENCIL · STARLINK + RUIJIE · REMOTE CONFIGURATION · 3 LOKASI</div>
+
+</div>
+</body>
+</html>
