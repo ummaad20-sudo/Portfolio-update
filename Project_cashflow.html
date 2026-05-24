@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rekapitulasi Cash Flow — PT. Tri Insani Mubdi</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Barlow:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pri: #10b981;
+    --pri-light: #6ee7b7;
+    --pri-dark: #065f46;
+    --red: #ef4444;
+    --red-light: #fca5a5;
+    --blue: #3b82f6;
+    --blue-light: #93c5fd;
+    --amber: #f59e0b;
+    --bg: #0A0E14;
+    --bg2: #111620;
+    --bg3: #1A2030;
+    --border: #2A3550;
+    --text: #C8D8F0;
+    --text-dim: #6A7A9A;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(16,185,129,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(16,185,129,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .wrap { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 24px 16px 64px; }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Share Tech Mono', monospace; font-size: 11px;
+    color: var(--text-dim); text-decoration: none; letter-spacing: 2px;
+    text-transform: uppercase; margin-bottom: 24px; padding: 8px 14px;
+    border: 1px solid var(--border); background: var(--bg2); transition: all 0.2s;
+  }
+  .back-btn:hover { color: var(--pri-light); border-color: rgba(16,185,129,0.4); }
+  .header {
+    position: relative; overflow: hidden; padding: 40px 32px;
+    background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.02));
+    border: 1px solid rgba(16,185,129,0.3); border-radius: 4px; margin-bottom: 32px;
+  }
+  .header::before {
+    content: '₿'; position: absolute; top: -20px; right: 20px;
+    font-size: 200px; opacity: 0.03; line-height: 1; color: var(--pri);
+  }
+  .header-deco {
+    position: absolute; top: 20px; right: 32px;
+    font-family: 'Share Tech Mono', monospace; font-size: 11px;
+    color: rgba(16,185,129,0.25); letter-spacing: 2px; line-height: 1.8; text-align: right;
+  }
+  .header-tag { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--pri); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 10px; }
+  .header h1 { font-family: 'Rajdhani', sans-serif; font-size: clamp(22px, 4vw, 34px); font-weight: 700; color: #fff; letter-spacing: 2px; margin-bottom: 4px; line-height: 1.2; }
+  .header h1 span { color: var(--pri-light); }
+  .header-sub { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 2px; margin-bottom: 12px; }
+  .header p { color: var(--text-dim); font-size: 13px; font-weight: 300; max-width: 560px; line-height: 1.8; }
+  .tags-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .tag { font-family: 'Share Tech Mono', monospace; font-size: 10px; padding: 4px 10px; border-radius: 2px; letter-spacing: 1px; text-transform: uppercase; }
+  .tag-green { background: rgba(16,185,129,0.1); color: var(--pri-light); border: 1px solid rgba(16,185,129,0.25); }
+  .tag-blue  { background: rgba(59,130,246,0.1); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+  .tag-amber { background: rgba(245,158,11,0.1); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+  .sec-title {
+    font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700;
+    letter-spacing: 2px; color: var(--pri-light); text-transform: uppercase;
+    margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+  }
+  .sec-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+  .grand-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .grand-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 4px;
+    padding: 22px 24px; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s;
+  }
+  .grand-card:hover { border-color: rgba(16,185,129,0.35); transform: translateY(-3px); }
+  .grand-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .grand-card.masuk::before  { background: linear-gradient(90deg, var(--pri-dark), var(--pri)); }
+  .grand-card.keluar::before { background: linear-gradient(90deg, #7f1d1d, var(--red)); }
+  .grand-card.saldo::before  { background: linear-gradient(90deg, #1e3a5f, var(--blue)); }
+  .grand-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 2px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .grand-val { font-family: 'Rajdhani', sans-serif; font-size: clamp(20px, 3.5vw, 28px); font-weight: 700; line-height: 1; }
+  .grand-card.masuk  .grand-val { color: var(--pri); }
+  .grand-card.keluar .grand-val { color: var(--red); }
+  .grand-card.saldo  .grand-val { color: var(--blue-light); }
+  .grand-sub { font-size: 11px; color: var(--text-dim); margin-top: 6px; font-family: 'Share Tech Mono', monospace; letter-spacing: 1px; }
+  .bulan-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 18px 20px; margin-bottom: 24px; }
+  .bulan-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 2px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+  .tahun-badge { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); }
+  .bulan-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .bulan-tab { font-family: 'Share Tech Mono', monospace; font-size: 11px; padding: 6px 14px; border-radius: 3px; border: 1px solid var(--border); background: var(--bg3); color: var(--text-dim); cursor: pointer; letter-spacing: 1px; transition: all 0.15s; }
+  .bulan-tab:hover { border-color: rgba(16,185,129,0.3); color: var(--text); }
+  .bulan-tab.active { background: var(--pri); color: #0A0E14; border-color: var(--pri); font-weight: 600; }
+  .mei-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .mei-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 20px 22px; position: relative; overflow: hidden; }
+  .mei-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
+  .mei-card.masuk::after  { background: var(--pri); }
+  .mei-card.keluar::after { background: var(--red); }
+  .mei-card.saldo::after  { background: var(--blue); }
+  .mei-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 2px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .mei-val { font-family: 'Rajdhani', sans-serif; font-size: clamp(20px, 3.5vw, 28px); font-weight: 700; }
+  .mei-card.masuk  .mei-val { color: var(--pri); }
+  .mei-card.keluar .mei-val { color: var(--red); }
+  .mei-card.saldo  .mei-val { color: var(--blue-light); }
+  .chart-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+  .chart-head { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+  .chart-title { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; letter-spacing: 1px; color: #fff; }
+  .chart-sub { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+  .chart-btns { display: flex; gap: 6px; }
+  .chart-btn { font-family: 'Share Tech Mono', monospace; font-size: 10px; padding: 5px 12px; border-radius: 3px; border: 1px solid var(--border); background: var(--bg3); color: var(--text-dim); cursor: pointer; letter-spacing: 1px; transition: all 0.15s; }
+  .chart-btn.active { background: rgba(16,185,129,0.15); color: var(--pri-light); border-color: rgba(16,185,129,0.4); }
+  .chart-body { padding: 24px 20px 16px; }
+  .bar-chart-outer { position: relative; padding-left: 44px; }
+  .y-labels { position: absolute; left: 0; top: 0; bottom: 28px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+  .y-label { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: rgba(106,122,154,0.5); }
+  .grid-lines { position: absolute; left: 44px; right: 0; top: 0; bottom: 28px; pointer-events: none; }
+  .grid-line { position: absolute; left: 0; right: 0; height: 1px; background: rgba(42,53,80,0.35); }
+  .bar-chart { display: flex; align-items: flex-end; height: 200px; padding-bottom: 28px; overflow-x: auto; }
+  .bar-group { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 52px; position: relative; height: 100%; justify-content: flex-end; }
+  .bars { display: flex; gap: 3px; align-items: flex-end; justify-content: center; margin-bottom: 2px; }
+  .bar { border-radius: 2px 2px 0 0; min-height: 2px; width: 14px; cursor: pointer; transition: opacity 0.15s; }
+  .bar:hover { opacity: 0.75; }
+  .bar.m { background: var(--pri); }
+  .bar.k { background: var(--red); }
+  .bar-lbl { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-dim); position: absolute; bottom: 4px; white-space: nowrap; letter-spacing: 0.5px; }
+  .chart-legend { display: flex; gap: 20px; justify-content: center; margin-top: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+  .card-head { background: var(--bg3); padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .card-head .label { font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 1px; }
+  .badge { font-family: 'Share Tech Mono', monospace; font-size: 11px; background: rgba(16,185,129,0.12); color: var(--pri-light); border: 1px solid rgba(16,185,129,0.3); padding: 3px 10px; border-radius: 2px; }
+  .filter-row { padding: 12px 20px; display: flex; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid var(--border); align-items: center; }
+  .filter-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 1px; margin-right: 4px; }
+  .filter-btn { font-family: 'Share Tech Mono', monospace; font-size: 10px; padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg3); color: var(--text-dim); cursor: pointer; letter-spacing: 0.5px; transition: all 0.15s; }
+  .filter-btn.active { background: var(--pri); color: #0A0E14; border-color: var(--pri); font-weight: 600; }
+  .filter-btn.f-operasional { background: rgba(59,130,246,0.12); color: #93c5fd; border-color: rgba(59,130,246,0.3); }
+  .filter-btn.f-project { background: rgba(245,158,11,0.1); color: #fcd34d; border-color: rgba(245,158,11,0.3); }
+  .filter-btn.f-gaji { background: rgba(168,85,247,0.1); color: #d8b4fe; border-color: rgba(168,85,247,0.3); }
+  .filter-btn.f-iuran { background: rgba(16,185,129,0.1); color: var(--pri-light); border-color: rgba(16,185,129,0.3); }
+  .filter-btn.f-lain { background: rgba(255,255,255,0.05); color: var(--text-dim); border-color: var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  th { font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; padding: 10px 14px; text-align: left; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th.num { text-align: right; }
+  td { padding: 12px 14px; border-bottom: 1px solid rgba(42,53,80,0.5); font-size: 13px; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(16,185,129,0.03); }
+  td.num { text-align: right; font-family: 'Share Tech Mono', monospace; font-size: 12px; }
+  .tfoot td { background: rgba(16,185,129,0.06); border-top: 1px solid rgba(16,185,129,0.2); font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; }
+  .td-date { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--text-dim); white-space: nowrap; }
+  .td-name { font-weight: 600; color: var(--text); }
+  .td-uraian { font-size: 12px; color: var(--text-dim); }
+  .td-masuk  { color: var(--pri); font-family: 'Share Tech Mono', monospace; font-size: 13px; font-weight: 600; }
+  .td-keluar { color: var(--red); font-family: 'Share Tech Mono', monospace; font-size: 13px; font-weight: 600; }
+  .td-dash { color: var(--text-dim); }
+  .kat-pill { display: inline-block; font-family: 'Share Tech Mono', monospace; font-size: 9px; padding: 2px 8px; border-radius: 10px; letter-spacing: 0.5px; white-space: nowrap; }
+  .kat-operasional { background: rgba(59,130,246,0.12); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+  .kat-iuran       { background: rgba(16,185,129,0.1); color: var(--pri-light); border: 1px solid rgba(16,185,129,0.25); }
+  .kat-gaji        { background: rgba(168,85,247,0.1); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.25); }
+  .kat-project     { background: rgba(245,158,11,0.1); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+  .fitur-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; padding: 20px; }
+  .fitur-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 16px 18px; transition: border-color 0.2s; }
+  .fitur-card:hover { border-color: rgba(16,185,129,0.35); }
+  .fitur-icon { font-size: 22px; margin-bottom: 10px; }
+  .fitur-title { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 1px; color: #fff; margin-bottom: 6px; }
+  .fitur-desc { font-size: 12px; color: var(--text-dim); line-height: 1.7; }
+  .stack-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 20px; }
+  .stack-item { background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 3px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .stack-icon { width: 36px; height: 36px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .stack-name { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
+  .stack-sub { font-size: 11px; color: var(--text-dim); }
+  .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; padding: 20px; }
+  .formula-box { background: rgba(0,0,0,0.25); border: 1px solid rgba(16,185,129,0.2); border-radius: 4px; padding: 18px 20px; text-align: center; }
+  .formula-label { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--text-dim); letter-spacing: 2px; margin-bottom: 10px; }
+  .formula-eq { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; color: var(--pri-light); letter-spacing: 1px; line-height: 1.6; }
+  .formula-desc { font-size: 11px; color: var(--text-dim); margin-top: 8px; line-height: 1.6; }
+  .tips { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); border-left: 3px solid var(--pri); padding: 16px 20px; border-radius: 3px; margin-bottom: 24px; }
+  .tips-title { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; color: var(--pri-light); margin-bottom: 10px; letter-spacing: 1px; }
+  .tips ul, .notes ul { list-style: none; }
+  .tips ul li, .notes ul li { font-size: 13px; color: var(--text-dim); padding: 4px 0 4px 16px; position: relative; line-height: 1.7; }
+  .tips ul li::before { content: '▸'; position: absolute; left: 0; color: var(--pri); opacity: 0.7; }
+  .notes { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); border-left: 3px solid var(--red); padding: 16px 20px; border-radius: 3px; margin-bottom: 24px; }
+  .notes-title { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; color: var(--red-light); margin-bottom: 10px; letter-spacing: 1px; }
+  .notes ul li::before { content: '▸'; position: absolute; left: 0; color: var(--red); opacity: 0.6; }
+  .footer { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 12px; font-family: 'Share Tech Mono', monospace; letter-spacing: 1px; }
+  @media (max-width: 600px) {
+    .grand-grid { grid-template-columns: 1fr; }
+    .mei-grid { grid-template-columns: 1fr; }
+    th { font-size: 9px; padding: 8px 10px; }
+    td { padding: 10px 10px; font-size: 12px; }
+    .header-deco { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="index.html" class="back-btn">← KEMBALI KE PORTFOLIO</a>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-deco">
+      TOTAL.MASUK += 1.000.000<br>
+      TOTAL.KELUAR -= 0<br>
+      SALDO.NET = 1.000.000<br>
+      STATUS: ACTIVE ●<br>
+      PLATFORM: BASE44
+    </div>
+    <div class="header-tag">💰 Software Finance — PT. Tri Insani Mubdi</div>
+    <h1>REKAPITULASI <span>CASH FLOW</span></h1>
+    <div class="header-sub">PLATFORM BASE44 · REAL-TIME FINANCIAL MONITORING</div>
+    <p>
+      Aplikasi manajemen arus kas (cashflow) yang dikembangkan menggunakan platform Base44.
+      Memungkinkan pencatatan pemasukan dan pengeluaran, visualisasi keuangan,
+      serta monitoring kondisi keuangan secara real-time.
+    </p>
+    <div class="tags-row">
+      <span class="tag tag-green">Base44</span>
+      <span class="tag tag-blue">Finance App</span>
+      <span class="tag tag-blue">Dashboard</span>
+      <span class="tag tag-green">Real-time Monitoring</span>
+      <span class="tag tag-amber">Data Visualization</span>
+    </div>
+  </div>
+
+  <!-- 01 GRAND TOTAL -->
+  <div class="sec-title">01 · Grand Total Seluruh Bulan</div>
+  <div class="grand-grid">
+    <div class="grand-card masuk">
+      <div class="grand-label"><span>↗</span> Total Masuk</div>
+      <div class="grand-val">Rp 1.000.000</div>
+      <div class="grand-sub">Seluruh Pemasukan · 2026</div>
+    </div>
+    <div class="grand-card keluar">
+      <div class="grand-label"><span>↘</span> Total Keluar</div>
+      <div class="grand-val">Rp 0</div>
+      <div class="grand-sub">Seluruh Pengeluaran · 2026</div>
+    </div>
+    <div class="grand-card saldo">
+      <div class="grand-label"><span>⚖</span> Grand Saldo</div>
+      <div class="grand-val">Rp 1.000.000</div>
+      <div class="grand-sub">Saldo Bersih Akhir · 2026</div>
+    </div>
+  </div>
+
+  <!-- 02 BULAN TABS -->
+  <div class="bulan-wrap">
+    <div class="bulan-label"><span>TAHUN</span><span class="tahun-badge">2026</span></div>
+    <div class="bulan-tabs">
+      <div class="bulan-tab">Jan</div><div class="bulan-tab">Feb</div>
+      <div class="bulan-tab">Mar</div><div class="bulan-tab">Apr</div>
+      <div class="bulan-tab active">Mei</div><div class="bulan-tab">Jun</div>
+      <div class="bulan-tab">Jul</div><div class="bulan-tab">Ags</div>
+      <div class="bulan-tab">Sep</div><div class="bulan-tab">Okt</div>
+      <div class="bulan-tab">Nov</div><div class="bulan-tab">Des</div>
+    </div>
+  </div>
+
+  <!-- 03 MEI SUMMARY -->
+  <div class="sec-title">03 · Ringkasan Bulan Mei 2026</div>
+  <div class="mei-grid">
+    <div class="mei-card masuk">
+      <div class="mei-label">PEMASUKAN MEI 2026<span>📈</span></div>
+      <div class="mei-val">Rp 1.000.000</div>
+    </div>
+    <div class="mei-card keluar">
+      <div class="mei-label">PENGELUARAN MEI 2026<span>📉</span></div>
+      <div class="mei-val">Rp 0</div>
+    </div>
+    <div class="mei-card saldo">
+      <div class="mei-label">SALDO MEI 2026<span>🗂</span></div>
+      <div class="mei-val">Rp 1.000.000</div>
+    </div>
+  </div>
+
+  <!-- 04 GRAFIK -->
+  <div class="sec-title">04 · Grafik Cash Flow 2026</div>
+  <div class="chart-card">
+    <div class="chart-head">
+      <div>
+        <div class="chart-title">Grafik Cash Flow</div>
+        <div class="chart-sub">Tahun 2026 · Per Bulan</div>
+      </div>
+      <div class="chart-btns">
+        <button class="chart-btn active">Bar</button>
+        <button class="chart-btn">Tren</button>
+        <button class="chart-btn">Kategori</button>
+      </div>
+    </div>
+    <div class="chart-body">
+      <div class="bar-chart-outer">
+        <div class="y-labels">
+          <span class="y-label">3.4Jt</span>
+          <span class="y-label">2.5Jt</span>
+          <span class="y-label">1.7Jt</span>
+          <span class="y-label">850Rb</span>
+          <span class="y-label">0</span>
+        </div>
+        <div class="grid-lines">
+          <div class="grid-line" style="top:0%"></div>
+          <div class="grid-line" style="top:25%"></div>
+          <div class="grid-line" style="top:50%"></div>
+          <div class="grid-line" style="top:75%"></div>
+        </div>
+        <div class="bar-chart">
+          <!-- Jan -->
+          <div class="bar-group">
+            <div class="bars">
+              <div class="bar m" style="height:50px;" title="Masuk Rp 850.000"></div>
+              <div class="bar k" style="height:12px;" title="Keluar Rp 200.000"></div>
+            </div>
+            <span class="bar-lbl">Jan</span>
+          </div>
+          <!-- Feb -->
+          <div class="bar-group">
+            <div class="bars">
+              <div class="bar m" style="height:30px;"></div>
+              <div class="bar k" style="height:18px;"></div>
+            </div>
+            <span class="bar-lbl">Feb</span>
+          </div>
+          <!-- Mar -->
+          <div class="bar-group">
+            <div class="bars">
+              <div class="bar m" style="height:170px;background:rgba(107,114,128,0.55);"></div>
+              <div class="bar k" style="height:2px;"></div>
+            </div>
+            <span class="bar-lbl">Mar</span>
+          </div>
+          <!-- Apr -->
+          <div class="bar-group">
+            <div class="bars">
+              <div class="bar m" style="height:130px;background:rgba(107,114,128,0.4);"></div>
+              <div class="bar k" style="height:118px;"></div>
+            </div>
+            <span class="bar-lbl">Apr</span>
+          </div>
+          <!-- Mei — ACTIVE -->
+          <div class="bar-group">
+            <div class="bars">
+              <div class="bar m" style="height:70px;box-shadow:0 0 10px rgba(16,185,129,0.55);"></div>
+              <div class="bar k" style="height:29px;box-shadow:0 0 8px rgba(239,68,68,0.45);"></div>
+            </div>
+            <span class="bar-lbl" style="color:var(--pri);">Mei ●</span>
+          </div>
+          <!-- Jun–Des empty -->
+          <div class="bar-group"><div class="bars"><div class="bar m" style="height:2px;opacity:0.2;"></div></div><span class="bar-lbl">Jun</span></div>
+          <div class="bar-group"><div class="bars"><div class="bar m" style="height:2px;opacity:0.2;"></div></div><span class="bar-lbl">Jul</span></div>
+          <div class="bar-group"><div class="bars"><div class="bar m" style="height:2px;opacity:0.2;"></div></div><span class="bar-lbl">Ags</span></div>
+          <div class="bar-group"><div class="bars"><div class="bar m" style="height:2px;opacity:0.2;"></div></div><span class="bar-lbl">Sep</span></div>
+          <div class="bar-group"><div class="bars"><div class="bar m" style="height:2px;opacity:0.2;"></div></div><span class="bar-lbl">Okt</span></div>
+          <div class="bar-group"><div class="bars"><div class="bar m" style="height:2px;opacity:0.2;"></div></div><span class="bar-lbl">Nov</span></div>
+          <div class="bar-group"><div class="bars"><div class="bar m" style="height:2px;opacity:0.2;"></div></div><span class="bar-lbl">Des</span></div>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--pri);"></div> Masuk</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red);"></div> Keluar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 TRANSAKSI -->
+  <div class="sec-title">05 · Riwayat Transaksi — Mei 2026</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">DETAIL TRANSAKSI BULAN MEI 2026</span>
+      <span class="badge">4 TRANSAKSI</span>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">FILTER:</span>
+      <button class="filter-btn active">Semua</button>
+      <button class="filter-btn f-operasional">Operasional</button>
+      <button class="filter-btn f-project">Project</button>
+      <button class="filter-btn f-gaji">Gaji</button>
+      <button class="filter-btn f-iuran">Iuran</button>
+      <button class="filter-btn f-lain">Lain-lain</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Nama</th>
+            <th>Uraian</th>
+            <th>Kategori</th>
+            <th class="num">Masuk</th>
+            <th class="num">Keluar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-date">23 Mei 2026</td>
+            <td class="td-name">Iman</td>
+            <td class="td-uraian">Dana Akomodasi Kota Makassar</td>
+            <td><span class="kat-pill kat-operasional">Operasional</span></td>
+            <td class="num td-dash">—</td>
+            <td class="num td-keluar">Rp 500.000</td>
+          </tr>
+          <tr>
+            <td class="td-date">09 Mei 2026</td>
+            <td class="td-name">Junaid A Isnam</td>
+            <td class="td-uraian">Iurani 2026</td>
+            <td><span class="kat-pill kat-iuran">Iuran</span></td>
+            <td class="num td-masuk">Rp 600.000</td>
+            <td class="num td-dash">—</td>
+          </tr>
+          <tr>
+            <td class="td-date">09 Mei 2026</td>
+            <td class="td-name">Mazharul Iman</td>
+            <td class="td-uraian">Iuran 2026</td>
+            <td><span class="kat-pill kat-iuran">Iuran</span></td>
+            <td class="num td-masuk">Rp 200.000</td>
+            <td class="num td-dash">—</td>
+          </tr>
+          <tr>
+            <td class="td-date">09 Mei 2026</td>
+            <td class="td-name">Sultan A</td>
+            <td class="td-uraian">Iuran 2026</td>
+            <td><span class="kat-pill kat-iuran">Iuran</span></td>
+            <td class="num td-masuk">Rp 400.000</td>
+            <td class="num td-dash">—</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="tfoot">
+            <td colspan="4"><b>TOTAL MEI 2026</b></td>
+            <td class="num"><b style="color:var(--pri)">Rp 1.200.000</b></td>
+            <td class="num"><b style="color:var(--red)">Rp 500.000</b></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- 06 FITUR -->
+  <div class="sec-title">06 · Fitur Aplikasi</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">MODUL & FITUR UTAMA APLIKASI</span>
+      <span class="badge">BASE44 PLATFORM</span>
+    </div>
+    <div class="fitur-grid">
+      <div class="fitur-card"><div class="fitur-icon">📝</div><div class="fitur-title">Pencatatan Transaksi</div><div class="fitur-desc">Input pemasukan & pengeluaran dengan kategori, nama pihak, uraian, dan nominal. Mendukung multi-kategori: Operasional, Gaji, Project, Iuran, Lain-lain.</div></div>
+      <div class="fitur-card"><div class="fitur-icon">📊</div><div class="fitur-title">Visualisasi Keuangan</div><div class="fitur-desc">Grafik bar interaktif cash flow per bulan, tampilan tren keuangan tahunan, dan breakdown per kategori untuk analisa mendalam.</div></div>
+      <div class="fitur-card"><div class="fitur-icon">🗂</div><div class="fitur-title">Filter & Pencarian</div><div class="fitur-desc">Filter transaksi berdasarkan kategori, bulan, atau nama pihak. Navigasi cepat antar bulan dengan selector bulan interaktif.</div></div>
+      <div class="fitur-card"><div class="fitur-icon">📤</div><div class="fitur-title">Import & Ekspor CSV</div><div class="fitur-desc">Import data transaksi massal via file CSV dan ekspor laporan keuangan lengkap untuk kebutuhan audit atau pelaporan manajemen.</div></div>
+      <div class="fitur-card"><div class="fitur-icon">📱</div><div class="fitur-title">Real-time Monitoring</div><div class="fitur-desc">Saldo dan summary terupdate otomatis setiap ada transaksi baru. Dashboard dapat diakses dari browser desktop maupun mobile.</div></div>
+      <div class="fitur-card"><div class="fitur-icon">🤖</div><div class="fitur-title">AI Advisor</div><div class="fitur-desc">Fitur konsultasi AI terintegrasi untuk analisa kondisi keuangan, saran pengelolaan arus kas, dan rekomendasi berdasarkan data historis.</div></div>
+    </div>
+  </div>
+
+  <!-- 07 FORMULA -->
+  <div class="sec-title">07 · Formula Kalkulasi</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">LOGIKA PERHITUNGAN SISTEM</span>
+      <span class="badge">OTOMATIS</span>
+    </div>
+    <div class="formula-grid">
+      <div class="formula-box">
+        <div class="formula-label">SALDO BULAN</div>
+        <div class="formula-eq">Total Masuk<br>− Total Keluar<br>= <span style="color:var(--pri)">Saldo Bulan</span></div>
+        <div class="formula-desc">Dihitung otomatis per bulan dari seluruh transaksi yang tercatat dalam periode tersebut.</div>
+      </div>
+      <div class="formula-box">
+        <div class="formula-label">GRAND SALDO</div>
+        <div class="formula-eq">Σ Semua Masuk<br>− Σ Semua Keluar<br>= <span style="color:var(--blue-light)">Grand Saldo</span></div>
+        <div class="formula-desc">Akumulasi seluruh transaksi sepanjang tahun — mencerminkan kondisi keuangan keseluruhan perusahaan.</div>
+      </div>
+      <div class="formula-box">
+        <div class="formula-label">DISTRIBUSI KATEGORI</div>
+        <div class="formula-eq">Σ per Kategori<br>÷ Total Keluar<br>= <span style="color:var(--amber)">% Distribusi</span></div>
+        <div class="formula-desc">Persentase pengeluaran per kategori untuk mengetahui pos biaya terbesar dalam operasional perusahaan.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 STACK -->
+  <div class="sec-title">08 · Stack Teknologi</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">PLATFORM & TOOLS YANG DIGUNAKAN</span>
+      <span class="badge">NO-CODE / LOW-CODE</span>
+    </div>
+    <div class="stack-row">
+      <div class="stack-item"><div class="stack-icon">⚡</div><div><div class="stack-name">Base44</div><div class="stack-sub">Platform Development Utama</div></div></div>
+      <div class="stack-item"><div class="stack-icon">🗄</div><div><div class="stack-name">Database Terintegrasi</div><div class="stack-sub">Penyimpanan Data Transaksi</div></div></div>
+      <div class="stack-item"><div class="stack-icon">📊</div><div><div class="stack-name">Chart Engine</div><div class="stack-sub">Visualisasi Data Keuangan</div></div></div>
+      <div class="stack-item"><div class="stack-icon">🤖</div><div><div class="stack-name">AI Advisor</div><div class="stack-sub">Analisa Keuangan Otomatis</div></div></div>
+      <div class="stack-item"><div class="stack-icon">📱</div><div><div class="stack-name">Responsive UI</div><div class="stack-sub">Mobile & Desktop Ready</div></div></div>
+      <div class="stack-item"><div class="stack-icon">📤</div><div><div class="stack-name">CSV Import/Export</div><div class="stack-sub">Integrasi Data Eksternal</div></div></div>
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="tips">
+    <div class="tips-title">✅ KEUNGGULAN APLIKASI</div>
+    <ul>
+      <li>Dikembangkan dengan Base44 — platform no-code/low-code yang memungkinkan development cepat tanpa infrastruktur server kompleks.</li>
+      <li>Saldo dan grafik terupdate real-time setiap ada input transaksi baru — tidak perlu refresh manual.</li>
+      <li>Fitur AI Advisor membantu manajemen mengambil keputusan keuangan berdasarkan data historis transaksi.</li>
+      <li>Sistem kategori fleksibel memudahkan pemisahan arus kas operasional, gaji, project, dan iuran perusahaan.</li>
+    </ul>
+  </div>
+
+  <!-- CATATAN -->
+  <div class="notes">
+    <div class="notes-title">⚠ CATATAN PENGGUNAAN</div>
+    <ul>
+      <li>Setiap transaksi wajib dilengkapi <b>Nama Pihak</b>, <b>Uraian</b>, <b>Kategori</b>, dan <b>Nominal</b> untuk konsistensi laporan.</li>
+      <li>Backup data secara berkala menggunakan fitur <b>Ekspor CSV</b> untuk mencegah kehilangan data.</li>
+      <li>Pastikan input nominal dalam satuan <b>Rupiah (Rp)</b> tanpa desimal untuk menghindari error kalkulasi.</li>
+      <li>Fitur Import CSV mengikuti format template yang disediakan — jangan ubah struktur kolom template.</li>
+    </ul>
+  </div>
+
+  <div class="footer">REKAPITULASI CASH FLOW · PT. TRI INSANI MUBDI · PLATFORM BASE44 · CREATED BY JUNAID ADZAN ISNAM</div>
+
+</div>
+<script>
+  document.querySelectorAll('.bulan-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.bulan-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.chart-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
