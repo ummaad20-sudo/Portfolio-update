@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instalasi Listrik Rumah Tipe 36 — Proyek</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Barlow:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pri:       #f59e0b;
+    --pri-light: #fcd34d;
+    --pri-dark:  #92400e;
+    --red:       #ef4444;
+    --red-light: #fca5a5;
+    --green:     #10b981;
+    --green-light:#6ee7b7;
+    --blue:      #3b82f6;
+    --blue-light:#93c5fd;
+    --bg:   #0A0E14;
+    --bg2:  #111620;
+    --bg3:  #1A2030;
+    --border:#2A3550;
+    --text: #C8D8F0;
+    --text-dim:#6A7A9A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden;}
+  body::before{
+    content:'';position:fixed;inset:0;
+    background-image:
+      linear-gradient(rgba(245,158,11,0.04) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(245,158,11,0.04) 1px,transparent 1px);
+    background-size:40px 40px;pointer-events:none;z-index:0;
+  }
+  .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:24px 16px 64px;}
+
+  /* BACK */
+  .back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);text-decoration:none;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;padding:8px 14px;border:1px solid var(--border);background:var(--bg2);transition:all .2s;}
+  .back-btn:hover{color:var(--pri-light);border-color:rgba(245,158,11,0.4);}
+
+  /* HEADER */
+  .header{position:relative;overflow:hidden;padding:40px 32px;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(245,158,11,0.02));border:1px solid rgba(245,158,11,0.3);border-radius:4px;margin-bottom:32px;}
+  .header::before{content:'⚡';position:absolute;top:-10px;right:16px;font-size:180px;opacity:0.04;line-height:1;}
+  .header-deco{position:absolute;top:20px;right:32px;font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(245,158,11,0.22);letter-spacing:2px;line-height:1.9;text-align:right;}
+  .header-tag{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--pri);letter-spacing:4px;text-transform:uppercase;margin-bottom:10px;}
+  .header h1{font-family:'Rajdhani',sans-serif;font-size:clamp(22px,4vw,34px);font-weight:700;color:#fff;letter-spacing:2px;margin-bottom:4px;line-height:1.2;}
+  .header h1 span{color:var(--pri-light);}
+  .header-sub{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);letter-spacing:2px;margin-bottom:12px;}
+  .header p{color:var(--text-dim);font-size:13px;font-weight:300;max-width:560px;line-height:1.8;}
+  .tags-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+  .tag{font-family:'Share Tech Mono',monospace;font-size:10px;padding:4px 10px;border-radius:2px;letter-spacing:1px;text-transform:uppercase;}
+  .tag-amber{background:rgba(245,158,11,0.1);color:var(--pri-light);border:1px solid rgba(245,158,11,0.25);}
+  .tag-blue {background:rgba(59,130,246,0.1);color:var(--blue-light);border:1px solid rgba(59,130,246,0.25);}
+  .tag-green{background:rgba(16,185,129,0.1);color:var(--green-light);border:1px solid rgba(16,185,129,0.25);}
+  .tag-red  {background:rgba(239,68,68,0.1);color:var(--red-light);border:1px solid rgba(239,68,68,0.25);}
+
+  /* SEC TITLE */
+  .sec-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:2px;color:var(--pri-light);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+  .sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+
+  /* SUMMARY STATS */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px;}
+  .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;}
+  .stat-card:hover{border-color:rgba(245,158,11,0.35);transform:translateY(-2px);}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pri-dark),var(--pri));}
+  .stat-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1.5px;margin-bottom:8px;}
+  .stat-val{font-family:'Rajdhani',sans-serif;font-size:clamp(18px,3vw,26px);font-weight:700;color:var(--pri-light);line-height:1;}
+  .stat-unit{font-size:12px;color:var(--text-dim);margin-top:4px;}
+
+  /* CARD */
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:24px;overflow:hidden;}
+  .card-head{background:var(--bg3);padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .card-head .label{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;}
+  .badge{font-family:'Share Tech Mono',monospace;font-size:11px;background:rgba(245,158,11,0.12);color:var(--pri-light);border:1px solid rgba(245,158,11,0.3);padding:3px 10px;border-radius:2px;}
+  .badge-green{background:rgba(16,185,129,0.12);color:var(--green-light);border-color:rgba(16,185,129,0.3);}
+  .badge-red{background:rgba(239,68,68,0.12);color:var(--red-light);border-color:rgba(239,68,68,0.3);}
+
+  /* TABLE */
+  table{width:100%;border-collapse:collapse;}
+  th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;padding:10px 16px;text-align:left;background:rgba(0,0,0,.2);border-bottom:1px solid var(--border);white-space:nowrap;}
+  th.r{text-align:right;}
+  td{padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);font-size:13px;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:rgba(245,158,11,0.02);}
+  td.r{text-align:right;font-family:'Share Tech Mono',monospace;font-size:12px;}
+  td.hl{color:var(--pri-light);font-family:'Share Tech Mono',monospace;font-weight:600;}
+  td.dim{color:var(--text-dim);font-size:12px;}
+  .tfoot td{background:rgba(245,158,11,0.07);border-top:1px solid rgba(245,158,11,0.25);font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;}
+
+  /* ROOM LOAD GRID */
+  .room-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:20px;}
+  .room-card{background:var(--bg3);border:1px solid var(--border);border-radius:4px;overflow:hidden;transition:border-color .2s;}
+  .room-card:hover{border-color:rgba(245,158,11,0.35);}
+  .room-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .room-icon{font-size:20px;width:34px;text-align:center;}
+  .room-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:#fff;}
+  .room-sub{font-size:11px;color:var(--text-dim);}
+  .room-body{padding:12px 16px;}
+  .room-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(42,53,80,0.35);font-size:12px;}
+  .room-row:last-child{border-bottom:none;}
+  .room-row .rk{color:var(--text-dim);}
+  .room-row .rv{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text);}
+  .room-total{padding:10px 16px;background:rgba(245,158,11,0.06);border-top:1px solid rgba(245,158,11,0.15);display:flex;justify-content:space-between;align-items:center;}
+  .room-total .rtk{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;}
+  .room-total .rtv{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--pri-light);}
+
+  /* WIRING DIAGRAM */
+  .wiring-wrap{padding:24px 20px;overflow-x:auto;}
+  .wiring{display:flex;align-items:center;gap:0;min-width:580px;justify-content:center;}
+  .w-node{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;}
+  .w-box{width:68px;height:68px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:26px;border:1px solid var(--border);background:var(--bg3);transition:border-color .2s;}
+  .w-box:hover{border-color:rgba(245,158,11,0.5);}
+  .w-box.pln   {border-color:rgba(59,130,246,0.4);background:rgba(59,130,246,0.07);}
+  .w-box.kWh   {border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.07);}
+  .w-box.mcb   {border-color:rgba(239,68,68,0.4);background:rgba(239,68,68,0.07);}
+  .w-box.panel {border-color:rgba(168,85,247,0.4);background:rgba(168,85,247,0.07);}
+  .w-box.beban {border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.04);}
+  .w-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:1px;text-align:center;line-height:1.4;}
+  .w-sub{font-size:8px;color:rgba(106,122,154,0.55);font-family:'Share Tech Mono',monospace;text-align:center;}
+  .w-line{flex:1;height:2px;background:linear-gradient(90deg,rgba(245,158,11,0.5),rgba(245,158,11,0.2));position:relative;min-width:24px;margin-top:-40px;}
+  .w-line::after{content:'';position:absolute;top:50%;right:-5px;transform:translateY(-50%);width:0;height:0;border-left:5px solid rgba(245,158,11,0.5);border-top:3px solid transparent;border-bottom:3px solid transparent;}
+  .w-line-lbl{position:absolute;top:-17px;left:50%;transform:translateX(-50%);font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(245,158,11,0.55);white-space:nowrap;}
+
+  /* STEPS */
+  .steps{padding:20px;display:flex;flex-direction:column;gap:0;}
+  .step{display:flex;gap:14px;position:relative;padding-bottom:20px;}
+  .step:last-child{padding-bottom:0;}
+  .step-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+  .step-num{width:32px;height:32px;border-radius:50%;background:rgba(245,158,11,0.14);border:1px solid rgba(245,158,11,0.4);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--pri-light);flex-shrink:0;z-index:1;}
+  .step-line{width:1px;flex:1;background:linear-gradient(to bottom,rgba(245,158,11,0.35),transparent);margin-top:4px;}
+  .step:last-child .step-line{display:none;}
+  .step-content{padding-top:4px;flex:1;}
+  .step-title{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:#fff;margin-bottom:4px;}
+  .step-desc{font-size:13px;color:var(--text-dim);line-height:1.75;}
+  .step-desc code{font-family:'Share Tech Mono',monospace;font-size:12px;background:rgba(245,158,11,0.1);color:var(--pri-light);padding:1px 6px;border-radius:2px;border:1px solid rgba(245,158,11,0.2);}
+
+  /* SPEC GRID */
+  .spec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px;}
+  .spec-card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+  .spec-card::before{content:'';display:block;height:3px;}
+  .spec-card.material::before{background:linear-gradient(90deg,#92400e,var(--pri));}
+  .spec-card.alat::before{background:linear-gradient(90deg,#1e3a5f,var(--blue));}
+  .spec-card.safety::before{background:linear-gradient(90deg,#7f1d1d,var(--red));}
+  .spec-card.standar::before{background:linear-gradient(90deg,#064e3b,var(--green));}
+  .spec-head{padding:14px 18px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .spec-ico{width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:18px;background:rgba(255,255,255,0.04);border-radius:4px;flex-shrink:0;}
+  .spec-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:#fff;}
+  .spec-sub{font-size:11px;color:var(--text-dim);}
+  .spec-body{padding:14px 18px;}
+  .spec-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid rgba(42,53,80,0.4);}
+  .spec-row:last-child{border-bottom:none;}
+  .spec-row .sk{font-size:13px;color:var(--text-dim);}
+  .spec-row .sv{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text);text-align:right;}
+  .spec-row .sv.hi{color:var(--pri-light);}
+
+  /* NOTES / TIPS */
+  .tips{background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.2);border-left:3px solid var(--green);padding:16px 20px;border-radius:3px;margin-bottom:24px;}
+  .tips-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--green-light);margin-bottom:10px;letter-spacing:1px;}
+  .notes{background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-left:3px solid var(--red);padding:16px 20px;border-radius:3px;margin-bottom:24px;}
+  .notes-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--red-light);margin-bottom:10px;letter-spacing:1px;}
+  .tips ul,.notes ul{list-style:none;}
+  .tips ul li,.notes ul li{font-size:13px;color:var(--text-dim);padding:4px 0 4px 16px;position:relative;line-height:1.7;}
+  .tips ul li::before{content:'▸';position:absolute;left:0;color:var(--green);opacity:.7;}
+  .notes ul li::before{content:'▸';position:absolute;left:0;color:var(--red);opacity:.6;}
+
+  /* PROGRESS BAR */
+  .progress-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(42,53,80,0.35);}
+  .progress-row:last-child{border-bottom:none;}
+  .pr-label{font-size:13px;color:var(--text);min-width:160px;}
+  .pr-bar-wrap{flex:1;background:rgba(255,255,255,0.05);border-radius:2px;height:8px;overflow:hidden;}
+  .pr-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--pri-dark),var(--pri));}
+  .pr-pct{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--pri-light);min-width:36px;text-align:right;}
+
+  /* SLD inline info */
+  .sld-info{background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:4px;padding:14px 18px;margin-top:18px;}
+  .sld-info-title{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--pri-light);letter-spacing:1px;margin-bottom:8px;}
+  .sld-info-text{font-size:13px;color:var(--text-dim);line-height:1.75;}
+
+  .footer{text-align:center;font-size:11px;color:var(--text-dim);margin-top:12px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+
+  @media(max-width:600px){
+    .stat-grid{grid-template-columns:1fr 1fr;}
+    .header h1{font-size:22px;}
+    .header-deco{display:none;}
+    th{font-size:9px;padding:8px 10px;}
+    td{padding:9px 10px;font-size:12px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="index.html" class="back-btn">← KEMBALI KE PORTFOLIO</a>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-deco">
+      DAYA.TERPASANG = 1300 VA<br>
+      BEBAN.TOTAL = 940 W<br>
+      FUSE.MCB = 6 A<br>
+      KABEL.NYM = 2.5 mm²<br>
+      STATUS: SELESAI ✓
+    </div>
+    <div class="header-tag">⚡ Instalasi Listrik — Hunian Tipe 36</div>
+    <h1>INSTALASI LISTRIK <span>RUMAH TIPE 36</span></h1>
+    <div class="header-sub">PLN 1300 VA · SINGLE PHASE · SNI 0225:2020 (PUIL 2020)</div>
+    <p>
+      Analisa dan perhitungan kebutuhan listrik hunian, perhitungan anggaran biaya,
+      pemasangan instalasi, pembuatan laporan, dan evaluasi proyek instalasi listrik
+      rumah tinggal tipe 36 sesuai standar PUIL 2020.
+    </p>
+    <div class="tags-row">
+      <span class="tag tag-amber">Instalasi Listrik</span>
+      <span class="tag tag-amber">Tipe 36</span>
+      <span class="tag tag-blue">PUIL 2020</span>
+      <span class="tag tag-green">PLN 1300 VA</span>
+      <span class="tag tag-red">Single Phase</span>
+      <span class="tag tag-blue">RAB</span>
+    </div>
+  </div>
+
+  <!-- 01 RINGKASAN -->
+  <div class="sec-title">01 · Ringkasan Proyek</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">DAYA PLN</div>
+      <div class="stat-val">1300 <span style="font-size:14px">VA</span></div>
+      <div class="stat-unit">Single Phase · 220V</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">TOTAL BEBAN</div>
+      <div class="stat-val">940 <span style="font-size:14px">W</span></div>
+      <div class="stat-unit">Seluruh ruangan</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">LUAS BANGUNAN</div>
+      <div class="stat-val">36 <span style="font-size:14px">m²</span></div>
+      <div class="stat-unit">Tipe 36 / 6×6 m</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">JUMLAH TITIK</div>
+      <div class="stat-val">18 <span style="font-size:14px">ttk</span></div>
+      <div class="stat-unit">Lampu + Stopkontak</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">MCB UTAMA</div>
+      <div class="stat-val">6 <span style="font-size:14px">A</span></div>
+      <div class="stat-unit">Circuit Breaker</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">STANDAR</div>
+      <div class="stat-val" style="font-size:16px">PUIL</div>
+      <div class="stat-unit">SNI 0225:2020</div>
+    </div>
+  </div>
+
+  <!-- 02 DENAH BEBAN PER RUANGAN -->
+  <div class="sec-title">02 · Analisa Beban Per Ruangan</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">KEBUTUHAN DAYA TIAP RUANGAN — TIPE 36</span>
+      <span class="badge">TOTAL 940 W</span>
+    </div>
+    <div class="room-grid">
+
+      <!-- Ruang Tamu -->
+      <div class="room-card">
+        <div class="room-head">
+          <div class="room-icon">🛋️</div>
+          <div><div class="room-name">RUANG TAMU</div><div class="room-sub">Living Room</div></div>
+        </div>
+        <div class="room-body">
+          <div class="room-row"><span class="rk">Lampu LED 10W</span><span class="rv">2× = 20 W</span></div>
+          <div class="room-row"><span class="rk">Stopkontak 200W</span><span class="rv">1× = 200 W</span></div>
+          <div class="room-row"><span class="rk">Titik Lampu</span><span class="rv">2 titik</span></div>
+          <div class="room-row"><span class="rk">Titik Stopkontak</span><span class="rv">1 titik</span></div>
+        </div>
+        <div class="room-total"><span class="rtk">TOTAL BEBAN</span><span class="rtv">220 W</span></div>
+      </div>
+
+      <!-- Kamar Tidur Utama -->
+      <div class="room-card">
+        <div class="room-head">
+          <div class="room-icon">🛏️</div>
+          <div><div class="room-name">KAMAR UTAMA</div><div class="room-sub">Master Bedroom</div></div>
+        </div>
+        <div class="room-body">
+          <div class="room-row"><span class="rk">Lampu LED 10W</span><span class="rv">2× = 20 W</span></div>
+          <div class="room-row"><span class="rk">Stopkontak 200W</span><span class="rv">2× = 400 W</span></div>
+          <div class="room-row"><span class="rk">Titik Lampu</span><span class="rv">2 titik</span></div>
+          <div class="room-row"><span class="rk">Titik Stopkontak</span><span class="rv">2 titik</span></div>
+        </div>
+        <div class="room-total"><span class="rtk">TOTAL BEBAN</span><span class="rtv">420 W</span></div>
+      </div>
+
+      <!-- Kamar Tidur 2 -->
+      <div class="room-card">
+        <div class="room-head">
+          <div class="room-icon">🪑</div>
+          <div><div class="room-name">KAMAR TIDUR 2</div><div class="room-sub">Bedroom 2</div></div>
+        </div>
+        <div class="room-body">
+          <div class="room-row"><span class="rk">Lampu LED 10W</span><span class="rv">1× = 10 W</span></div>
+          <div class="room-row"><span class="rk">Stopkontak 200W</span><span class="rv">1× = 200 W</span></div>
+          <div class="room-row"><span class="rk">Titik Lampu</span><span class="rv">1 titik</span></div>
+          <div class="room-row"><span class="rk">Titik Stopkontak</span><span class="rv">1 titik</span></div>
+        </div>
+        <div class="room-total"><span class="rtk">TOTAL BEBAN</span><span class="rtv">210 W</span></div>
+      </div>
+
+      <!-- Dapur -->
+      <div class="room-card">
+        <div class="room-head">
+          <div class="room-icon">🍳</div>
+          <div><div class="room-name">DAPUR</div><div class="room-sub">Kitchen</div></div>
+        </div>
+        <div class="room-body">
+          <div class="room-row"><span class="rk">Lampu LED 10W</span><span class="rv">1× = 10 W</span></div>
+          <div class="room-row"><span class="rk">Stopkontak 200W</span><span class="rv">1× = 200 W</span></div>
+          <div class="room-row"><span class="rk">Titik Lampu</span><span class="rv">1 titik</span></div>
+          <div class="room-row"><span class="rk">Titik Stopkontak</span><span class="rv">1 titik</span></div>
+        </div>
+        <div class="room-total"><span class="rtk">TOTAL BEBAN</span><span class="rtv">210 W</span></div>
+      </div>
+
+      <!-- Kamar Mandi -->
+      <div class="room-card">
+        <div class="room-head">
+          <div class="room-icon">🚿</div>
+          <div><div class="room-name">KAMAR MANDI</div><div class="room-sub">Bathroom</div></div>
+        </div>
+        <div class="room-body">
+          <div class="room-row"><span class="rk">Lampu LED 7W</span><span class="rv">1× = 7 W</span></div>
+          <div class="room-row"><span class="rk">Stopkontak</span><span class="rv">— (tidak dipasang)</span></div>
+          <div class="room-row"><span class="rk">Titik Lampu</span><span class="rv">1 titik</span></div>
+          <div class="room-row"><span class="rk">Titik Stopkontak</span><span class="rv">0 titik</span></div>
+        </div>
+        <div class="room-total"><span class="rtk">TOTAL BEBAN</span><span class="rtv">7 W</span></div>
+      </div>
+
+      <!-- Teras -->
+      <div class="room-card">
+        <div class="room-head">
+          <div class="room-icon">🏠</div>
+          <div><div class="room-name">TERAS / LUAR</div><div class="room-sub">Outdoor Area</div></div>
+        </div>
+        <div class="room-body">
+          <div class="room-row"><span class="rk">Lampu Teras 18W</span><span class="rv">1× = 18 W</span></div>
+          <div class="room-row"><span class="rk">Stopkontak Outdoor</span><span class="rv">— (opsional)</span></div>
+          <div class="room-row"><span class="rk">Titik Lampu</span><span class="rv">1 titik</span></div>
+          <div class="room-row"><span class="rk">Saklar</span><span class="rv">1 titik</span></div>
+        </div>
+        <div class="room-total"><span class="rtk">TOTAL BEBAN</span><span class="rtv">18 W</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 03 PERHITUNGAN DAYA -->
+  <div class="sec-title">03 · Perhitungan Kebutuhan Daya</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">REKAPITULASI DAYA & VALIDASI PLN 1300 VA</span>
+      <span class="badge badge-green">✓ LAYAK 1300 VA</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Ruangan</th><th>Lampu (W)</th><th>Stopkontak (W)</th><th class="r">Total (W)</th><th class="r">% Beban</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="dim">1</td><td>Ruang Tamu</td><td>20 W</td><td>200 W</td>
+          <td class="r hl">220 W</td><td class="r dim">23.4 %</td>
+        </tr>
+        <tr>
+          <td class="dim">2</td><td>Kamar Tidur Utama</td><td>20 W</td><td>400 W</td>
+          <td class="r hl">420 W</td><td class="r dim">44.7 %</td>
+        </tr>
+        <tr>
+          <td class="dim">3</td><td>Kamar Tidur 2</td><td>10 W</td><td>200 W</td>
+          <td class="r hl">210 W</td><td class="r dim">22.3 %</td>
+        </tr>
+        <tr>
+          <td class="dim">4</td><td>Dapur</td><td>10 W</td><td>200 W</td>
+          <td class="r hl">210 W</td><td class="r dim">22.3 %</td>
+        </tr>
+        <tr>
+          <td class="dim">5</td><td>Kamar Mandi</td><td>7 W</td><td>—</td>
+          <td class="r hl">7 W</td><td class="r dim">0.7 %</td>
+        </tr>
+        <tr>
+          <td class="dim">6</td><td>Teras / Luar</td><td>18 W</td><td>—</td>
+          <td class="r hl">18 W</td><td class="r dim">1.9 %</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr class="tfoot">
+          <td colspan="4"><b>TOTAL KEBUTUHAN DAYA</b></td>
+          <td class="r"><b style="color:var(--pri-light)">940 W</b></td>
+          <td class="r"><b style="color:var(--green-light)">72.3 %</b></td>
+        </tr>
+      </tfoot>
+    </table>
+    <div style="padding:18px 20px;">
+      <!-- Progress distribusi beban -->
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:12px;">DISTRIBUSI BEBAN PER RUANGAN</div>
+      <div class="progress-row"><span class="pr-label">Kamar Tidur Utama</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:72%"></div></div><span class="pr-pct">420 W</span></div>
+      <div class="progress-row"><span class="pr-label">Ruang Tamu</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:38%"></div></div><span class="pr-pct">220 W</span></div>
+      <div class="progress-row"><span class="pr-label">Kamar Tidur 2</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:36%"></div></div><span class="pr-pct">210 W</span></div>
+      <div class="progress-row"><span class="pr-label">Dapur</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:36%"></div></div><span class="pr-pct">210 W</span></div>
+      <div class="progress-row"><span class="pr-label">Teras</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:3%"></div></div><span class="pr-pct">18 W</span></div>
+      <div class="progress-row"><span class="pr-label">Kamar Mandi</span><div class="pr-bar-wrap"><div class="pr-bar" style="width:1.5%"></div></div><span class="pr-pct">7 W</span></div>
+
+      <div class="sld-info" style="margin-top:18px;">
+        <div class="sld-info-title">📐 VALIDASI KAPASITAS PLN</div>
+        <div class="sld-info-text">
+          <b style="color:var(--text)">Daya PLN terpasang:</b> 1300 VA → Daya aktif maks ≈ <b style="color:var(--pri-light)">1170 W</b> (cos φ = 0.9)<br>
+          <b style="color:var(--text)">Total beban terpasang:</b> <b style="color:var(--pri-light)">940 W</b> (72.3% dari kapasitas)<br>
+          <b style="color:var(--green-light)">✓ Kapasitas 1300 VA LAYAK</b> — Masih ada cadangan daya 230 W untuk kebutuhan beban tambahan di masa depan.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 SINGLE LINE DIAGRAM -->
+  <div class="sec-title">04 · Single Line Diagram (SLD)</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">SKEMA INSTALASI LISTRIK TIPE 36</span>
+      <span class="badge">220V / 50Hz / 1 PHASA</span>
+    </div>
+    <div class="wiring-wrap">
+      <div class="wiring">
+        <div class="w-node">
+          <div class="w-box pln">🏭</div>
+          <div class="w-label">SUMBER<br>PLN</div>
+          <div class="w-sub">220V / 50Hz</div>
+        </div>
+        <div class="w-line"><div class="w-line-lbl">Kabel SR</div></div>
+        <div class="w-node">
+          <div class="w-box kWh">⏱️</div>
+          <div class="w-label">kWh METER<br>PLN</div>
+          <div class="w-sub">1300 VA</div>
+        </div>
+        <div class="w-line"><div class="w-line-lbl">NYM 2×10mm²</div></div>
+        <div class="w-node">
+          <div class="w-box mcb">🔴</div>
+          <div class="w-label">MCB UTAMA<br>6 Ampere</div>
+          <div class="w-sub">Proteksi</div>
+        </div>
+        <div class="w-line"><div class="w-line-lbl">NYM 2.5mm²</div></div>
+        <div class="w-node">
+          <div class="w-box panel">📦</div>
+          <div class="w-label">PANEL BOX<br>MCB GRUP</div>
+          <div class="w-sub">2 Grup Sirkit</div>
+        </div>
+        <div class="w-line"><div class="w-line-lbl">NYM 2.5mm²</div></div>
+        <div class="w-node">
+          <div class="w-box beban">💡</div>
+          <div class="w-label">BEBAN<br>INSTALASI</div>
+          <div class="w-sub">Lampu + SK</div>
+        </div>
+      </div>
+
+      <div style="margin-top:22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+        <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:3px;padding:12px 16px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--blue-light);letter-spacing:1px;margin-bottom:6px;">GRUP 1 — PENCAHAYAAN</div>
+          <div style="font-size:12px;color:var(--text-dim);line-height:1.7;">MCB 6A → Sirkit lampu seluruh ruangan (Ruang Tamu, Kamar, Dapur, KM, Teras). Total: 65 W</div>
+        </div>
+        <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:3px;padding:12px 16px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--pri-light);letter-spacing:1px;margin-bottom:6px;">GRUP 2 — STOPKONTAK</div>
+          <div style="font-size:12px;color:var(--text-dim);line-height:1.7;">MCB 10A → Sirkit stopkontak daya (Ruang Tamu, Kamar Utama, Kamar 2, Dapur). Total: 875 W</div>
+        </div>
+        <div style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15);border-radius:3px;padding:12px 16px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--green-light);letter-spacing:1px;margin-bottom:6px;">GROUNDING SISTEM</div>
+          <div style="font-size:12px;color:var(--text-dim);line-height:1.7;">Elektroda pentanahan terpasang pada panel box. Resistansi tanah ≤ 5 Ohm sesuai PUIL 2020.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 BILL OF MATERIAL -->
+  <div class="sec-title">05 · Bill of Material (BOM)</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">DAFTAR MATERIAL INSTALASI LISTRIK TIPE 36</span>
+      <span class="badge">KEBUTUHAN LENGKAP</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Nama Material</th><th>Spesifikasi</th><th class="r">Qty</th><th>Satuan</th><th class="r">Harga Sat. (Rp)</th><th class="r">Total (Rp)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="dim">1</td><td>MCB Utama</td><td>1P 6A 220V</td>
+            <td class="r">1</td><td>pcs</td><td class="r">85.000</td><td class="r hl">85.000</td>
+          </tr>
+          <tr>
+            <td class="dim">2</td><td>MCB Grup Pencahayaan</td><td>1P 6A 220V</td>
+            <td class="r">1</td><td>pcs</td><td class="r">75.000</td><td class="r hl">75.000</td>
+          </tr>
+          <tr>
+            <td class="dim">3</td><td>MCB Grup Stopkontak</td><td>1P 10A 220V</td>
+            <td class="r">1</td><td>pcs</td><td class="r">80.000</td><td class="r hl">80.000</td>
+          </tr>
+          <tr>
+            <td class="dim">4</td><td>Box Panel (PHB)</td><td>3 Way Outbow</td>
+            <td class="r">1</td><td>pcs</td><td class="r">120.000</td><td class="r hl">120.000</td>
+          </tr>
+          <tr>
+            <td class="dim">5</td><td>Kabel NYM 2×2.5 mm²</td><td>Eterna / Supreme</td>
+            <td class="r">50</td><td>meter</td><td class="r">18.000</td><td class="r hl">900.000</td>
+          </tr>
+          <tr>
+            <td class="dim">6</td><td>Kabel NYM 2×1.5 mm²</td><td>Sirkit Lampu</td>
+            <td class="r">30</td><td>meter</td><td class="r">12.500</td><td class="r hl">375.000</td>
+          </tr>
+          <tr>
+            <td class="dim">7</td><td>Kabel NYM 2×10 mm²</td><td>Kabel Masuk kWh–Panel</td>
+            <td class="r">3</td><td>meter</td><td class="r">45.000</td><td class="r hl">135.000</td>
+          </tr>
+          <tr>
+            <td class="dim">8</td><td>Stopkontak Tanam</td><td>2P + PE / 16A</td>
+            <td class="r">6</td><td>pcs</td><td class="r">35.000</td><td class="r hl">210.000</td>
+          </tr>
+          <tr>
+            <td class="dim">9</td><td>Saklar Tunggal</td><td>Broco / Schneider</td>
+            <td class="r">6</td><td>pcs</td><td class="r">25.000</td><td class="r hl">150.000</td>
+          </tr>
+          <tr>
+            <td class="dim">10</td><td>Saklar Seri / Ganda</td><td>2 Gang Switch</td>
+            <td class="r">2</td><td>pcs</td><td class="r">35.000</td><td class="r hl">70.000</td>
+          </tr>
+          <tr>
+            <td class="dim">11</td><td>Fitting Lampu Plafon</td><td>E27 Inbow</td>
+            <td class="r">8</td><td>pcs</td><td class="r">22.000</td><td class="r hl">176.000</td>
+          </tr>
+          <tr>
+            <td class="dim">12</td><td>Lampu LED Bulb 10W</td><td>Philips / Panasonic</td>
+            <td class="r">7</td><td>pcs</td><td class="r">45.000</td><td class="r hl">315.000</td>
+          </tr>
+          <tr>
+            <td class="dim">13</td><td>Lampu Teras 18W</td><td>LED Outdoor IP44</td>
+            <td class="r">1</td><td>pcs</td><td class="r">85.000</td><td class="r hl">85.000</td>
+          </tr>
+          <tr>
+            <td class="dim">14</td><td>Pipa Conduit PVC Ø20</td><td>Clipsal / Ega</td>
+            <td class="r">15</td><td>batang</td><td class="r">18.000</td><td class="r hl">270.000</td>
+          </tr>
+          <tr>
+            <td class="dim">15</td><td>Klem Pipa + Sekrup</td><td>Ukuran 20 mm</td>
+            <td class="r">50</td><td>pcs</td><td class="r">1.500</td><td class="r hl">75.000</td>
+          </tr>
+          <tr>
+            <td class="dim">16</td><td>Grounding Rod Copper</td><td>1.5 m × 5/8"</td>
+            <td class="r">1</td><td>set</td><td class="r">145.000</td><td class="r hl">145.000</td>
+          </tr>
+          <tr>
+            <td class="dim">17</td><td>Kabel BC / Grounding</td><td>6 mm² Telanjang</td>
+            <td class="r">5</td><td>meter</td><td class="r">15.000</td><td class="r hl">75.000</td>
+          </tr>
+          <tr>
+            <td class="dim">18</td><td>Isolasi / Ties / Aksesori</td><td>Berbagai ukuran</td>
+            <td class="r">1</td><td>set</td><td class="r">75.000</td><td class="r hl">75.000</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="tfoot">
+            <td colspan="6"><b>TOTAL BIAYA MATERIAL</b></td>
+            <td class="r"><b style="color:var(--pri-light)">Rp 3.341.000</b></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- 06 RAB -->
+  <div class="sec-title">06 · Rencana Anggaran Biaya (RAB)</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">ESTIMASI BIAYA TOTAL PROYEK INSTALASI</span>
+      <span class="badge">ESTIMASI 2024</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Komponen Biaya</th><th>Keterangan</th><th class="r">Jumlah (Rp)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="dim">1</td>
+            <td>Material Instalasi</td>
+            <td class="dim">Kabel, MCB, Fitting, Lampu, Conduit, dll.</td>
+            <td class="r hl">3.341.000</td>
+          </tr>
+          <tr>
+            <td class="dim">2</td>
+            <td>Biaya Jasa Pemasangan</td>
+            <td class="dim">Tenaga instalatir bersertifikat PLN (18 titik × Rp 85.000)</td>
+            <td class="r hl">1.530.000</td>
+          </tr>
+          <tr>
+            <td class="dim">3</td>
+            <td>Biaya Pengujian & Komisioning</td>
+            <td class="dim">Pengujian isolasi, continuity, grounding, uji beban</td>
+            <td class="r hl">350.000</td>
+          </tr>
+          <tr>
+            <td class="dim">4</td>
+            <td>Biaya Perizinan PLN (SLO)</td>
+            <td class="dim">Sertifikat Laik Operasi untuk 1300 VA</td>
+            <td class="r hl">250.000</td>
+          </tr>
+          <tr>
+            <td class="dim">5</td>
+            <td>Biaya Penyambungan PLN</td>
+            <td class="dim">Pasang baru 1300 VA (estimasi)</td>
+            <td class="r hl">1.100.000</td>
+          </tr>
+          <tr>
+            <td class="dim">6</td>
+            <td>Biaya Tak Terduga (10%)</td>
+            <td class="dim">Cadangan biaya tidak terduga</td>
+            <td class="r hl">657.100</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr class="tfoot">
+            <td colspan="3"><b>TOTAL ANGGARAN PROYEK</b></td>
+            <td class="r"><b style="color:var(--pri-light)">Rp 7.228.100</b></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <div style="padding:16px 20px;background:rgba(245,158,11,0.04);border-top:1px solid rgba(245,158,11,0.1);">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;">
+        <div style="text-align:center;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px;">MATERIAL</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--pri)">46.2 %</div>
+          <div style="font-size:11px;color:var(--text-dim);">Rp 3.341.000</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px;">JASA</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--blue)">21.2 %</div>
+          <div style="font-size:11px;color:var(--text-dim);">Rp 1.530.000</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px;">PLN + IZIN</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--green)">18.7 %</div>
+          <div style="font-size:11px;color:var(--text-dim);">Rp 1.350.000</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px;">LAIN-LAIN</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--red)">13.9 %</div>
+          <div style="font-size:11px;color:var(--text-dim);">Rp 1.007.100</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 SPESIFIKASI TEKNIS -->
+  <div class="sec-title">07 · Spesifikasi Teknis Material</div>
+  <div class="spec-grid">
+    <div class="spec-card material">
+      <div class="spec-head"><div class="spec-ico">🔌</div><div><div class="spec-name">KABEL NYM</div><div class="spec-sub">Penghantar Utama</div></div></div>
+      <div class="spec-body">
+        <div class="spec-row"><span class="sk">Jenis</span><span class="sv hi">NYM (PVC/PVC)</span></div>
+        <div class="spec-row"><span class="sk">Sirkit Daya</span><span class="sv">2×2.5 mm²</span></div>
+        <div class="spec-row"><span class="sk">Sirkit Lampu</span><span class="sv">2×1.5 mm²</span></div>
+        <div class="spec-row"><span class="sk">Tegangan Kerja</span><span class="sv">500/750 V</span></div>
+        <div class="spec-row"><span class="sk">Merk</span><span class="sv">Eterna / Supreme</span></div>
+        <div class="spec-row"><span class="sk">Standar</span><span class="sv">SNI 04-6629</span></div>
+      </div>
+    </div>
+    <div class="spec-card alat">
+      <div class="spec-head"><div class="spec-ico">🔴</div><div><div class="spec-name">MCB / CB</div><div class="spec-sub">Circuit Breaker</div></div></div>
+      <div class="spec-body">
+        <div class="spec-row"><span class="sk">MCB Utama</span><span class="sv hi">1P 6A</span></div>
+        <div class="spec-row"><span class="sk">MCB Pencahayaan</span><span class="sv">1P 6A</span></div>
+        <div class="spec-row"><span class="sk">MCB Stopkontak</span><span class="sv">1P 10A</span></div>
+        <div class="spec-row"><span class="sk">Breaking Capacity</span><span class="sv">4.5 kA</span></div>
+        <div class="spec-row"><span class="sk">Kurva Trip</span><span class="sv">Tipe B/C</span></div>
+        <div class="spec-row"><span class="sk">Merk</span><span class="sv">Schneider / ABB</span></div>
+      </div>
+    </div>
+    <div class="spec-card safety">
+      <div class="spec-head"><div class="spec-ico">⚡</div><div><div class="spec-name">GROUNDING</div><div class="spec-sub">Sistem Pentanahan</div></div></div>
+      <div class="spec-body">
+        <div class="spec-row"><span class="sk">Elektroda</span><span class="sv hi">Copper Rod 1.5 m</span></div>
+        <div class="spec-row"><span class="sk">Kabel Grounding</span><span class="sv">BC 6 mm²</span></div>
+        <div class="spec-row"><span class="sk">Resistansi Maks</span><span class="sv">≤ 5 Ohm</span></div>
+        <div class="spec-row"><span class="sk">Warna Kabel</span><span class="sv">Kuning-Hijau (PE)</span></div>
+        <div class="spec-row"><span class="sk">Sambungan SK</span><span class="sv">2P + PE (3-wire)</span></div>
+        <div class="spec-row"><span class="sk">Standar</span><span class="sv">PUIL 2020 Psl.3.13</span></div>
+      </div>
+    </div>
+    <div class="spec-card standar">
+      <div class="spec-head"><div class="spec-ico">📋</div><div><div class="spec-name">STANDAR PUIL</div><div class="spec-sub">SNI 0225:2020</div></div></div>
+      <div class="spec-body">
+        <div class="spec-row"><span class="sk">Tinggi Stopkontak</span><span class="sv hi">30 cm dari lantai</span></div>
+        <div class="spec-row"><span class="sk">Tinggi Saklar</span><span class="sv">150 cm dari lantai</span></div>
+        <div class="spec-row"><span class="sk">Jarak Antar SK</span><span class="sv">Maks. 3 m</span></div>
+        <div class="spec-row"><span class="sk">Jumlah Titik/Grup</span><span class="sv">Maks. 12 titik</span></div>
+        <div class="spec-row"><span class="sk">Faktor Beban</span><span class="sv">Maks. 80%</span></div>
+        <div class="spec-row"><span class="sk">Uji Isolasi</span><span class="sv">≥ 1 MΩ</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 TAHAPAN PEMASANGAN -->
+  <div class="sec-title">08 · Tahapan Pemasangan Instalasi</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">ALUR KERJA INSTALASI LISTRIK</span>
+      <span class="badge">7 TAHAP</span>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">SURVEY & PERENCANAAN</div>
+          <div class="step-desc">Survei lapangan untuk mengetahui kondisi bangunan, tentukan titik-titik lampu dan stopkontak, buat <code>denah instalasi</code> dan single line diagram (SLD). Hitung total kebutuhan daya dan tentukan kapasitas MCB yang sesuai.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">PERSIAPAN MATERIAL & ALAT</div>
+          <div class="step-desc">Pengadaan seluruh material sesuai BOM: kabel <code>NYM 2.5mm²</code> dan <code>1.5mm²</code>, MCB, panel box, fitting, saklar, stopkontak, pipa conduit, dan aksesori. Siapkan alat kerja: tang, obeng, tespen, multimeter, dan AVO meter.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">PEMASANGAN PIPA CONDUIT & ROUTING KABEL</div>
+          <div class="step-desc">Pasang pipa konduit <code>PVC Ø20 mm</code> di dinding/plafon mengikuti jalur yang telah direncanakan. Tarik kabel NYM melalui pipa. Gunakan bor untuk membuat alur (inbow) atau klem untuk instalasi outbow.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">PEMASANGAN PANEL BOX & MCB</div>
+          <div class="step-desc">Pasang panel box (PHB) di dinding, tinggi 150–180 cm dari lantai. Pasang MCB utama dan MCB grup. Sambungkan kabel masuk dari kWh meter PLN ke MCB utama, lalu distribusikan ke masing-masing MCB grup <code>pencahayaan</code> dan <code>stopkontak</code>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">5</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">PEMASANGAN TITIK BEBAN</div>
+          <div class="step-desc">Pasang fitting lampu plafon, saklar, dan stopkontak di setiap titik yang telah ditentukan. Tinggi stopkontak <code>30 cm dari lantai</code>, saklar <code>150 cm dari lantai</code>. Sambungkan kabel sesuai warna: <code>merah/hitam = fase</code>, <code>biru = netral</code>, <code>kuning-hijau = ground</code>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">6</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">PEMASANGAN SISTEM GROUNDING</div>
+          <div class="step-desc">Tanam elektroda pentanahan (grounding rod copper) sedalam minimal 1.5 m di tanah. Sambungkan dengan kabel BC ke terminal PE di panel box. Ukur resistansi tanah menggunakan <code>earth tester</code> — pastikan ≤ 5 Ω sesuai PUIL 2020.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">7</div></div>
+        <div class="step-content">
+          <div class="step-title">PENGUJIAN, KOMISIONING & LAPORAN</div>
+          <div class="step-desc">Lakukan uji isolasi <code>≥ 1 MΩ</code> menggunakan megger, uji kontinuitas konduktor, verifikasi grounding, dan uji fungsi seluruh titik beban. Buat <code>laporan as-built drawing</code>, dokumentasi foto, dan berita acara serah terima. Ajukan SLO ke PLN untuk penyambungan resmi.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 09 EVALUASI -->
+  <div class="sec-title">09 · Evaluasi Proyek</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">HASIL PENGUJIAN & EVALUASI INSTALASI</span>
+      <span class="badge badge-green">✓ LULUS UJI</span>
+    </div>
+    <div style="padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+
+      <div style="background:var(--bg3);border:1px solid rgba(16,185,129,0.2);border-radius:4px;padding:16px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--green-light);letter-spacing:1px;margin-bottom:12px;">📊 HASIL UJI ISOLASI</div>
+        <div class="progress-row" style="padding:6px 0;">
+          <span class="pr-label" style="font-size:12px;min-width:140px;">Grup Pencahayaan</span>
+          <div class="pr-bar-wrap"><div class="pr-bar" style="width:95%;background:linear-gradient(90deg,#065f46,var(--green));"></div></div>
+          <span class="pr-pct" style="color:var(--green-light)">2.1 MΩ</span>
+        </div>
+        <div class="progress-row" style="padding:6px 0;">
+          <span class="pr-label" style="font-size:12px;min-width:140px;">Grup Stopkontak</span>
+          <div class="pr-bar-wrap"><div class="pr-bar" style="width:88%;background:linear-gradient(90deg,#065f46,var(--green));"></div></div>
+          <span class="pr-pct" style="color:var(--green-light)">1.8 MΩ</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:10px;">✓ Nilai ≥ 1 MΩ — Memenuhi standar PUIL 2020</div>
+      </div>
+
+      <div style="background:var(--bg3);border:1px solid rgba(16,185,129,0.2);border-radius:4px;padding:16px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--green-light);letter-spacing:1px;margin-bottom:12px;">⚡ HASIL UJI GROUNDING</div>
+        <div style="text-align:center;padding:10px 0;">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:38px;font-weight:700;color:var(--green);line-height:1;">3.2</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);">Ohm</div>
+        </div>
+        <div style="font-size:12px;color:var(--text-dim);text-align:center;margin-top:6px;">Resistansi Pentanahan<br>✓ Memenuhi syarat ≤ 5 Ω (PUIL 2020)</div>
+      </div>
+
+      <div style="background:var(--bg3);border:1px solid rgba(16,185,129,0.2);border-radius:4px;padding:16px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--green-light);letter-spacing:1px;margin-bottom:12px;">💡 CHECKLIST HASIL UJI</div>
+        <div style="display:flex;flex-direction:column;gap:7px;font-size:12px;color:var(--text-dim);">
+          <div><span style="color:var(--green)">✓</span> Kontinuitas konduktor fase OK</div>
+          <div><span style="color:var(--green)">✓</span> Kontinuitas konduktor netral OK</div>
+          <div><span style="color:var(--green)">✓</span> Sistem grounding berfungsi baik</div>
+          <div><span style="color:var(--green)">✓</span> MCB trip test normal</div>
+          <div><span style="color:var(--green)">✓</span> Seluruh 18 titik berfungsi</div>
+          <div><span style="color:var(--green)">✓</span> Uji beban penuh 940 W aman</div>
+          <div><span style="color:var(--green)">✓</span> SLO PLN siap diajukan</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="tips">
+    <div class="tips-title">✅ KEUNGGULAN PROYEK INI</div>
+    <ul>
+      <li>Seluruh instalasi menggunakan kabel berstandar SNI — aman untuk pemakaian jangka panjang.</li>
+      <li>Dua grup sirkit terpisah (pencahayaan & stopkontak) meningkatkan keandalan sistem dan memudahkan troubleshooting.</li>
+      <li>Sistem grounding terpasang dengan resistansi 3.2 Ω — melindungi penghuni dari bahaya sengatan listrik.</li>
+      <li>Kapasitas daya 1300 VA masih memiliki cadangan 230 W — fleksibel untuk penambahan beban di masa depan.</li>
+      <li>Dokumentasi as-built drawing dan laporan evaluasi lengkap untuk keperluan SLO PLN.</li>
+    </ul>
+  </div>
+
+  <!-- CATATAN -->
+  <div class="notes">
+    <div class="notes-title">⚠ PERHATIAN KESELAMATAN KERJA (K3 LISTRIK)</div>
+    <ul>
+      <li>Matikan MCB utama dan pastikan tegangan = 0 volt sebelum memulai pekerjaan instalasi menggunakan <b>tespen/voltmeter</b>.</li>
+      <li>Gunakan APD lengkap: sarung tangan isolasi 1000V, kacamata keselamatan, dan sepatu anti-listrik.</li>
+      <li>Instalasi wajib dikerjakan oleh <b>tenaga instalatir listrik bersertifikat PLN</b> (SILO/SIL).</li>
+      <li>Jangan memasang stopkontak di area basah (kamar mandi/dapur dekat air) tanpa proteksi <b>IP44 minimum</b>.</li>
+      <li>Wajib melengkapi dokumen <b>SLO (Sertifikat Laik Operasi)</b> dari PLN sebelum menyalakan listrik pertama kali.</li>
+      <li>Uji ulang resistansi grounding setiap <b>2 tahun sekali</b> untuk memastikan pentanahan tetap efektif.</li>
+    </ul>
+  </div>
+
+  <div class="footer">INSTALASI LISTRIK RUMAH TIPE 36 · PLN 1300 VA · SNI 0225:2020 (PUIL 2020) · SINGLE PHASE</div>
+
+</div>
+</body>
+</html>
