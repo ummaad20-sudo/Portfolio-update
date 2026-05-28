@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voucher Sales Pro — Rekap Penjualan WiFi</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Barlow:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pri:       #3b82f6;
+    --pri-light: #93c5fd;
+    --pri-dark:  #1d4ed8;
+    --green:     #4CAF50;
+    --green-light:#86efac;
+    --amber:     #FF9800;
+    --amber-light:#fcd34d;
+    --red:       #E53935;
+    --red-light: #fca5a5;
+    --purple:    #8b5cf6;
+    --purple-light:#c4b5fd;
+    --bg:   #0A0E14;
+    --bg2:  #111620;
+    --bg3:  #1A2030;
+    --border:#2A3550;
+    --text: #C8D8F0;
+    --text-dim:#6A7A9A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden;}
+  body::before{
+    content:'';position:fixed;inset:0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.04) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(59,130,246,0.04) 1px,transparent 1px);
+    background-size:40px 40px;pointer-events:none;z-index:0;
+  }
+  .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:24px 16px 64px;}
+
+  .back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);text-decoration:none;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;padding:8px 14px;border:1px solid var(--border);background:var(--bg2);transition:all .2s;}
+  .back-btn:hover{color:var(--pri-light);border-color:rgba(59,130,246,0.4);}
+
+  /* HEADER */
+  .header{position:relative;overflow:hidden;padding:40px 32px;background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(59,130,246,0.02));border:1px solid rgba(59,130,246,0.3);border-radius:4px;margin-bottom:32px;}
+  .header::before{content:'📶';position:absolute;top:-10px;right:16px;font-size:180px;opacity:0.04;line-height:1;}
+  .header-deco{position:absolute;top:20px;right:32px;font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(59,130,246,0.22);letter-spacing:2px;line-height:1.9;text-align:right;}
+  .header-tag{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--pri);letter-spacing:4px;text-transform:uppercase;margin-bottom:10px;}
+  .header h1{font-family:'Rajdhani',sans-serif;font-size:clamp(22px,4vw,34px);font-weight:700;color:#fff;letter-spacing:2px;margin-bottom:4px;line-height:1.2;}
+  .header h1 span{color:var(--pri-light);}
+  .header-sub{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);letter-spacing:2px;margin-bottom:12px;}
+  .header p{color:var(--text-dim);font-size:13px;font-weight:300;max-width:560px;line-height:1.8;}
+  .tags-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+  .tag{font-family:'Share Tech Mono',monospace;font-size:10px;padding:4px 10px;border-radius:2px;letter-spacing:1px;text-transform:uppercase;}
+  .tag-blue  {background:rgba(59,130,246,0.1);color:var(--pri-light);border:1px solid rgba(59,130,246,0.25);}
+  .tag-green {background:rgba(76,175,80,0.1);color:var(--green-light);border:1px solid rgba(76,175,80,0.25);}
+  .tag-amber {background:rgba(255,152,0,0.1);color:var(--amber-light);border:1px solid rgba(255,152,0,0.25);}
+  .tag-purple{background:rgba(139,92,246,0.1);color:var(--purple-light);border:1px solid rgba(139,92,246,0.25);}
+
+  .sec-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:2px;color:var(--pri-light);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+  .sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+
+  /* STAT GRID */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:24px;}
+  .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;text-align:center;}
+  .stat-card:hover{border-color:rgba(59,130,246,0.35);transform:translateY(-2px);}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--pri-dark),var(--pri));}
+  .stat-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1.5px;margin-bottom:8px;}
+  .stat-val{font-family:'Rajdhani',sans-serif;font-size:clamp(18px,3vw,26px);font-weight:700;color:var(--pri-light);line-height:1;}
+  .stat-unit{font-size:11px;color:var(--text-dim);margin-top:4px;}
+
+  /* CARD */
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:24px;overflow:hidden;}
+  .card-head{background:var(--bg3);padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .card-head .label{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;}
+  .badge{font-family:'Share Tech Mono',monospace;font-size:11px;background:rgba(59,130,246,0.12);color:var(--pri-light);border:1px solid rgba(59,130,246,0.3);padding:3px 10px;border-radius:2px;}
+  .badge-green{background:rgba(76,175,80,0.12);color:var(--green-light);border-color:rgba(76,175,80,0.3);}
+  .badge-amber{background:rgba(255,152,0,0.12);color:var(--amber-light);border-color:rgba(255,152,0,0.3);}
+
+  /* MOBILE UI MOCKUP */
+  .mockup-wrap{padding:24px 20px;display:flex;justify-content:center;gap:24px;flex-wrap:wrap;}
+  .phone-frame{width:260px;background:#0d1117;border:2px solid rgba(59,130,246,0.3);border-radius:24px;overflow:hidden;box-shadow:0 0 30px rgba(59,130,246,0.1);flex-shrink:0;}
+  .phone-status{background:#111;height:28px;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .phone-notch{width:60px;height:14px;background:#000;border-radius:0 0 10px 10px;}
+  .phone-screen{background:#F0F2F5;padding:0;}
+
+  /* App header dalam mockup */
+  .app-header{background:#fff;padding:12px 14px;text-align:center;border-bottom:1px solid #e0e0e0;}
+  .app-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#1A237E;}
+  .app-sub{font-size:9px;color:#666;font-family:'Share Tech Mono',monospace;}
+
+  /* Card-card dalam mockup */
+  .app-card{margin:8px;border-radius:10px;padding:10px 12px;}
+  .app-card.blue{background:#BBDEFB;}
+  .app-card.green{background:#C8E6C9;}
+  .app-card.white{background:#fff;border:1px solid #e0e0e0;}
+  .app-card-title{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:#333;margin-bottom:6px;}
+
+  /* Input fields dalam mockup */
+  .mock-field{background:#fff;border:1px solid #ccc;border-radius:6px;padding:5px 8px;font-size:9px;color:#555;margin-bottom:5px;font-family:'Share Tech Mono',monospace;}
+  .mock-field-row{display:flex;gap:5px;margin-bottom:5px;}
+  .mock-field-row .mock-field{flex:1;margin-bottom:0;}
+
+  /* Buttons dalam mockup */
+  .mock-btn{border-radius:6px;padding:6px 10px;font-size:10px;font-weight:700;text-align:center;color:#fff;margin-bottom:5px;font-family:'Rajdhani',sans-serif;letter-spacing:0.5px;}
+  .mock-btn.green-btn{background:#4CAF50;}
+  .mock-btn.blue-btn{background:#1A237E;}
+  .mock-btn.red-btn{background:#E53935;}
+  .mock-btn.orange-btn{background:#FF9800;}
+  .mock-btn.lightblue-btn{background:#2196F3;}
+  .mock-btn-row{display:flex;gap:5px;}
+  .mock-btn-row .mock-btn{flex:1;}
+
+  /* Result area dalam mockup */
+  .mock-result{background:#fff;border-radius:8px;margin:8px;padding:10px;font-size:9px;color:#333;font-family:'Share Tech Mono',monospace;line-height:1.6;min-height:80px;border:1px solid #e0e0e0;}
+  .mock-result .r-header{font-weight:700;color:#1A237E;font-size:10px;}
+  .mock-result .r-date{font-weight:700;color:#333;}
+  .mock-result .r-item{color:#555;padding-left:4px;}
+  .mock-result .r-total{color:#0000bb;font-weight:700;}
+  .mock-result .r-grand{color:#1A237E;font-weight:700;font-size:10px;}
+  .mock-result .r-div{color:#aaa;}
+
+  .mock-actions{display:flex;gap:5px;margin:0 8px 8px;}
+  .mock-actions .mock-btn{flex:1;}
+
+  /* FITUR GRID */
+  .fitur-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;padding:20px;}
+  .fitur-card{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:16px 18px;transition:border-color .2s;position:relative;overflow:hidden;}
+  .fitur-card:hover{border-color:rgba(59,130,246,0.35);}
+  .fitur-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
+  .fitur-card.f-green::before{background:var(--green);}
+  .fitur-card.f-blue::before{background:var(--pri);}
+  .fitur-card.f-orange::before{background:var(--amber);}
+  .fitur-card.f-red::before{background:var(--red);}
+  .fitur-card.f-purple::before{background:var(--purple);}
+  .fitur-card.f-teal::before{background:#14b8a6;}
+  .fitur-icon{font-size:22px;margin-bottom:10px;}
+  .fitur-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:#fff;margin-bottom:6px;}
+  .fitur-desc{font-size:12px;color:var(--text-dim);line-height:1.7;}
+
+  /* CODE BLOCK */
+  .code-block{background:#0d1117;border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin:0;overflow-x:auto;}
+  .code-block pre{font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.8;color:#e2e8f0;}
+  .code-comment{color:#6A7A9A;}
+  .code-key{color:#93c5fd;}
+  .code-str{color:#86efac;}
+  .code-func{color:#fcd34d;}
+  .code-val{color:#f9a8d4;}
+
+  /* STEPS */
+  .steps{padding:20px;display:flex;flex-direction:column;gap:0;}
+  .step{display:flex;gap:14px;position:relative;padding-bottom:20px;}
+  .step:last-child{padding-bottom:0;}
+  .step-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+  .step-num{width:32px;height:32px;border-radius:50%;background:rgba(59,130,246,0.14);border:1px solid rgba(59,130,246,0.4);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--pri-light);flex-shrink:0;z-index:1;}
+  .step-line{width:1px;flex:1;background:linear-gradient(to bottom,rgba(59,130,246,0.35),transparent);margin-top:4px;}
+  .step:last-child .step-line{display:none;}
+  .step-content{padding-top:4px;flex:1;}
+  .step-title{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:#fff;margin-bottom:4px;}
+  .step-desc{font-size:13px;color:var(--text-dim);line-height:1.75;}
+  .step-desc code{font-family:'Share Tech Mono',monospace;font-size:12px;background:rgba(59,130,246,0.1);color:var(--pri-light);padding:1px 6px;border-radius:2px;border:1px solid rgba(59,130,246,0.2);}
+
+  /* STACK */
+  .stack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:20px;}
+  .stack-item{background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:3px;padding:14px 16px;display:flex;align-items:center;gap:12px;}
+  .stack-icon{width:36px;height:36px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .stack-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.5px;}
+  .stack-sub{font-size:11px;color:var(--text-dim);}
+
+  /* FLOWCHART */
+  .flow-wrap{padding:20px;overflow-x:auto;}
+  .flow{display:flex;align-items:center;gap:0;min-width:600px;justify-content:center;}
+  .f-node{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:90px;}
+  .f-box{width:70px;height:70px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:26px;border:1px solid var(--border);background:var(--bg3);transition:border-color .2s;}
+  .f-box:hover{border-color:rgba(59,130,246,0.5);}
+  .f-box.excel{border-color:rgba(255,152,0,0.4);background:rgba(255,152,0,0.07);}
+  .f-box.manual{border-color:rgba(76,175,80,0.4);background:rgba(76,175,80,0.07);}
+  .f-box.process{border-color:rgba(59,130,246,0.4);background:rgba(59,130,246,0.07);}
+  .f-box.output{border-color:rgba(139,92,246,0.4);background:rgba(139,92,246,0.07);}
+  .f-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:1px;text-align:center;line-height:1.4;}
+  .f-arrow{flex:1;height:2px;background:linear-gradient(90deg,rgba(59,130,246,0.5),rgba(59,130,246,0.2));min-width:20px;position:relative;margin-top:-40px;}
+  .f-arrow::after{content:'';position:absolute;top:50%;right:-5px;transform:translateY(-50%);width:0;height:0;border-left:5px solid rgba(59,130,246,0.5);border-top:3px solid transparent;border-bottom:3px solid transparent;}
+
+  /* SAMPLE OUTPUT */
+  .output-box{background:#0d1117;border:1px solid var(--border);border-radius:4px;padding:20px;margin:0 20px 20px;font-family:'Share Tech Mono',monospace;font-size:13px;line-height:1.9;}
+  .out-header{color:var(--pri-light);font-weight:700;font-size:14px;}
+  .out-div{color:var(--text-dim);}
+  .out-date{color:#fff;font-weight:700;}
+  .out-item{color:var(--text-dim);}
+  .out-item span{color:var(--text);}
+  .out-total{color:#60a5fa;font-weight:700;}
+  .out-grand{color:var(--pri-light);font-size:16px;font-weight:700;}
+  .out-sep{color:var(--border);}
+
+  .tips{background:rgba(76,175,80,0.05);border:1px solid rgba(76,175,80,0.2);border-left:3px solid var(--green);padding:16px 20px;border-radius:3px;margin-bottom:24px;}
+  .tips-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--green-light);margin-bottom:10px;letter-spacing:1px;}
+  .tips ul{list-style:none;}
+  .tips ul li{font-size:13px;color:var(--text-dim);padding:4px 0 4px 16px;position:relative;line-height:1.7;}
+  .tips ul li::before{content:'▸';position:absolute;left:0;color:var(--green);opacity:.7;}
+
+  .notes{background:rgba(229,57,53,0.05);border:1px solid rgba(229,57,53,0.2);border-left:3px solid var(--red);padding:16px 20px;border-radius:3px;margin-bottom:24px;}
+  .notes-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--red-light);margin-bottom:10px;letter-spacing:1px;}
+  .notes ul{list-style:none;}
+  .notes ul li{font-size:13px;color:var(--text-dim);padding:4px 0 4px 16px;position:relative;line-height:1.7;}
+  .notes ul li::before{content:'▸';position:absolute;left:0;color:var(--red);opacity:.6;}
+
+  .footer{text-align:center;font-size:11px;color:var(--text-dim);margin-top:12px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+
+  @media(max-width:600px){
+    .stat-grid{grid-template-columns:1fr 1fr;}
+    .header h1{font-size:22px;}
+    .header-deco{display:none;}
+    .phone-frame{width:220px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="index.html" class="back-btn">← KEMBALI KE PORTFOLIO</a>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-deco">
+      PLATFORM: KIVY (PYTHON)<br>
+      TARGET: ANDROID / DESKTOP<br>
+      INPUT: EXCEL + MANUAL<br>
+      OUTPUT: REKAP + COPY<br>
+      VERSION: V4 ●
+    </div>
+    <div class="header-tag">📱 Mobile App — Python Kivy</div>
+    <h1>VOUCHER SALES <span>PRO V4</span></h1>
+    <div class="header-sub">REKAP PENJUALAN VOUCHER WiFi · KIVY FRAMEWORK</div>
+    <p>
+      Aplikasi mobile dan desktop berbasis Python Kivy untuk rekap penjualan voucher WiFi.
+      Mendukung input manual, import file Excel (.xlsx), pencarian dan penghapusan data per tanggal,
+      serta ekspor hasil rekapitulasi ke clipboard.
+    </p>
+    <div class="tags-row">
+      <span class="tag tag-blue">Python</span>
+      <span class="tag tag-blue">Kivy</span>
+      <span class="tag tag-green">Android</span>
+      <span class="tag tag-amber">openpyxl</span>
+      <span class="tag tag-purple">Voucher WiFi</span>
+      <span class="tag tag-blue">Cross-platform</span>
+    </div>
+  </div>
+
+  <!-- 01 RINGKASAN -->
+  <div class="sec-title">01 · Ringkasan Aplikasi</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">PLATFORM</div>
+      <div class="stat-val" style="font-size:16px;">Kivy</div>
+      <div class="stat-unit">Python Framework</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">TARGET OS</div>
+      <div class="stat-val" style="font-size:15px;">Android</div>
+      <div class="stat-unit">+ Desktop</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">VERSI</div>
+      <div class="stat-val">V4</div>
+      <div class="stat-unit">Voucher Sales Pro</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">INPUT MODE</div>
+      <div class="stat-val">2</div>
+      <div class="stat-unit">Manual + Excel</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">BAHASA</div>
+      <div class="stat-val" style="font-size:16px;">Python</div>
+      <div class="stat-unit">3.8+</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">LISENSI</div>
+      <div class="stat-val" style="font-size:14px;">Custom</div>
+      <div class="stat-unit">By Junaid Adzan</div>
+    </div>
+  </div>
+
+  <!-- 02 UI MOCKUP -->
+  <div class="sec-title">02 · Tampilan Antarmuka (UI Mockup)</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">SIMULASI TAMPILAN APLIKASI ANDROID</span>
+      <span class="badge">SCREEN PREVIEW</span>
+    </div>
+    <div class="mockup-wrap">
+
+      <!-- Mockup Layar Utama -->
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);text-align:center;letter-spacing:1px;margin-bottom:8px;">LAYAR UTAMA</div>
+        <div class="phone-frame">
+          <div class="phone-status">
+            <div class="phone-notch"></div>
+          </div>
+          <div class="phone-screen">
+            <!-- App Header -->
+            <div class="app-header">
+              <div class="app-title">VOUCHER SALES PRO</div>
+              <div class="app-sub">Creat by @ Junaid adzan isnam</div>
+            </div>
+
+            <!-- Input Card -->
+            <div class="app-card blue">
+              <div class="app-card-title">Input Manual Penjualan</div>
+              <div class="mock-field-row">
+                <div class="mock-field">2024-01-15</div>
+                <div class="mock-field">Kode Voucher</div>
+              </div>
+              <div class="mock-field-row">
+                <div class="mock-field">Nama Grup</div>
+                <div class="mock-field">Harga</div>
+              </div>
+              <div class="mock-btn green-btn">TAMBAH DATA</div>
+            </div>
+
+            <!-- Search Card -->
+            <div class="app-card green">
+              <div class="mock-field">Ketik Tanggal (YYYY-MM-DD)...</div>
+              <div class="mock-btn-row">
+                <div class="mock-btn blue-btn">CARI DATA</div>
+                <div class="mock-btn red-btn">HAPUS DATA</div>
+              </div>
+            </div>
+
+            <!-- Result Area -->
+            <div class="mock-result">
+              <div class="r-header">HASIL REKAP VOUCHER</div>
+              <div class="r-div">——————————</div>
+              <div class="r-date">Tanggal : 2024-01-15</div>
+              <div class="r-item"> • Paket 1H : 5 pcs | Rp 50.000</div>
+              <div class="r-item"> • Paket 1D : 3 pcs | Rp 75.000</div>
+              <div class="r-total">TOTAL: Rp 125.000</div>
+              <div class="r-div">——————————</div>
+              <div class="r-grand">GRAND TOTAL: Rp 125.000</div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mock-actions">
+              <div class="mock-btn orange-btn">PILIH EXCEL</div>
+              <div class="mock-btn lightblue-btn">COPY HASIL</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mockup File Chooser -->
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);text-align:center;letter-spacing:1px;margin-bottom:8px;">FILE CHOOSER</div>
+        <div class="phone-frame">
+          <div class="phone-status">
+            <div class="phone-notch"></div>
+          </div>
+          <div class="phone-screen">
+            <div class="app-header">
+              <div class="app-title" style="font-size:13px;">Pilih File Excel</div>
+            </div>
+            <!-- File List -->
+            <div style="padding:8px;">
+              <div style="background:#fff;border-radius:6px;overflow:hidden;border:1px solid #ddd;">
+                <div style="background:#f5f5f5;padding:6px 10px;font-size:9px;color:#666;font-family:'Share Tech Mono',monospace;border-bottom:1px solid #ddd;">/storage/emulated/0/</div>
+                <div style="padding:4px 10px;">
+                  <div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #f0f0f0;">
+                    <span style="font-size:14px;">📁</span>
+                    <span style="font-size:9px;color:#333;font-family:'Share Tech Mono',monospace;">Documents</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #f0f0f0;">
+                    <span style="font-size:14px;">📁</span>
+                    <span style="font-size:9px;color:#333;font-family:'Share Tech Mono',monospace;">Download</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #eef6ee;background:#eef6ee;border-radius:4px;padding:5px 6px;">
+                    <span style="font-size:14px;">📊</span>
+                    <span style="font-size:9px;color:#1A237E;font-family:'Share Tech Mono',monospace;font-weight:700;">voucher_jan2024.xlsx</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #f0f0f0;">
+                    <span style="font-size:14px;">📊</span>
+                    <span style="font-size:9px;color:#333;font-family:'Share Tech Mono',monospace;">rekap_feb2024.xlsx</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:6px;padding:5px 0;">
+                    <span style="font-size:14px;">📊</span>
+                    <span style="font-size:9px;color:#333;font-family:'Share Tech Mono',monospace;">data_voucher.xlsx</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Info bar -->
+            <div style="margin:0 8px;padding:8px;background:#E3F2FD;border-radius:6px;font-size:9px;color:#1A237E;font-family:'Share Tech Mono',monospace;">
+              ✓ Filter: *.xlsx saja<br>
+              ✓ Pilih file lalu submit
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 03 FITUR UTAMA -->
+  <div class="sec-title">03 · Fitur Utama Aplikasi</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">MODUL & FITUR VOUCHER SALES PRO V4</span>
+      <span class="badge">6 FITUR UTAMA</span>
+    </div>
+    <div class="fitur-grid">
+      <div class="fitur-card f-green">
+        <div class="fitur-icon">✍️</div>
+        <div class="fitur-title">Input Manual</div>
+        <div class="fitur-desc">Tambah data penjualan langsung dari form: Tanggal, Kode Voucher, Nama Grup, dan Harga. Auto-fill tanggal hari ini.</div>
+      </div>
+      <div class="fitur-card f-orange">
+        <div class="fitur-icon">📊</div>
+        <div class="fitur-title">Import File Excel</div>
+        <div class="fitur-desc">Baca file .xlsx dari storage Android/desktop. Otomatis deteksi kolom: Grup pengguna, Harga, Diaktifkan di, Kode voucher.</div>
+      </div>
+      <div class="fitur-card f-blue">
+        <div class="fitur-icon">🔍</div>
+        <div class="fitur-title">Pencarian Data</div>
+        <div class="fitur-desc">Filter rekap berdasarkan tanggal tertentu (format YYYY-MM-DD). Hasil ditampilkan real-time di panel hasil.</div>
+      </div>
+      <div class="fitur-card f-red">
+        <div class="fitur-icon">🗑️</div>
+        <div class="fitur-title">Hapus Data Tanggal</div>
+        <div class="fitur-desc">Hapus seluruh data penjualan pada tanggal tertentu secara instan. Notifikasi konfirmasi jumlah data yang dihapus.</div>
+      </div>
+      <div class="fitur-card f-purple">
+        <div class="fitur-icon">📋</div>
+        <div class="fitur-title">Copy ke Clipboard</div>
+        <div class="fitur-desc">Salin seluruh hasil rekap (tanpa markup) ke clipboard — siap dikirim via WhatsApp, Telegram, atau email.</div>
+      </div>
+      <div class="fitur-card f-teal">
+        <div class="fitur-icon">📈</div>
+        <div class="fitur-title">Rekap Otomatis</div>
+        <div class="fitur-desc">Kalkulasi otomatis: total per grup, total per tanggal, dan Grand Total semua periode. Diperbarui real-time.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 ALUR DATA -->
+  <div class="sec-title">04 · Alur Data Aplikasi</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">FLOWCHART INPUT → PROSES → OUTPUT</span>
+      <span class="badge">DATA FLOW</span>
+    </div>
+    <div class="flow-wrap">
+      <div class="flow">
+        <div class="f-node">
+          <div class="f-box excel">📊</div>
+          <div class="f-label">FILE<br>EXCEL</div>
+        </div>
+        <div class="f-arrow"></div>
+        <div class="f-node">
+          <div class="f-box manual">✍️</div>
+          <div class="f-label">INPUT<br>MANUAL</div>
+        </div>
+        <div class="f-arrow"></div>
+        <div class="f-node">
+          <div class="f-box process">🔧</div>
+          <div class="f-label">all_data<br>LIST</div>
+        </div>
+        <div class="f-arrow"></div>
+        <div class="f-node">
+          <div class="f-box process">📐</div>
+          <div class="f-label">REKAP<br>& KALKULASI</div>
+        </div>
+        <div class="f-arrow"></div>
+        <div class="f-node">
+          <div class="f-box output">📋</div>
+          <div class="f-label">HASIL<br>+ COPY</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:20px;">
+        <div style="background:rgba(255,152,0,0.07);border:1px solid rgba(255,152,0,0.2);border-radius:3px;padding:12px 16px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--amber-light);letter-spacing:1px;margin-bottom:6px;">INPUT: EXCEL</div>
+          <div style="font-size:12px;color:var(--text-dim);line-height:1.7;">openpyxl membaca header kolom otomatis. Mendukung tanggal sebagai datetime object atau string. Kode voucher opsional (N/A jika tidak ada).</div>
+        </div>
+        <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:3px;padding:12px 16px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--pri-light);letter-spacing:1px;margin-bottom:6px;">PROSES: KALKULASI</div>
+          <div style="font-size:12px;color:var(--text-dim);line-height:1.7;">defaultdict mengelompokkan data per (tanggal, grup). Menghitung jumlah pcs, total rupiah, total per hari, dan Grand Total seluruh periode.</div>
+        </div>
+        <div style="background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.2);border-radius:3px;padding:12px 16px;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--purple-light);letter-spacing:1px;margin-bottom:6px;">OUTPUT: REKAP</div>
+          <div style="font-size:12px;color:var(--text-dim);line-height:1.7;">Dua versi output: tampilan markup Kivy (warna, bold) untuk Label, dan versi bersih plain text untuk disalin ke clipboard/WhatsApp.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 CONTOH OUTPUT -->
+  <div class="sec-title">05 · Contoh Output Rekap</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">SAMPLE OUTPUT — HASIL REKAP VOUCHER</span>
+      <span class="badge badge-green">PLAIN TEXT FORMAT</span>
+    </div>
+    <div class="output-box">
+      <div class="out-header">HASIL REKAP VOUCHER</div>
+      <div class="out-div">===================</div>
+      <br>
+      <div class="out-date">Tanggal : 2024-01-15</div>
+      <div class="out-item"> • <span>Paket 1 Jam</span> : 12 pcs | Rp 120.000</div>
+      <div class="out-item"> • <span>Paket 1 Hari</span> : 8 pcs  | Rp 400.000</div>
+      <div class="out-item"> • <span>Paket 7 Hari</span> : 3 pcs  | Rp 450.000</div>
+      <div class="out-total">TOTAL 2024-01-15 : Rp 970.000</div>
+      <div class="out-sep">-----------------------------</div>
+      <br>
+      <div class="out-date">Tanggal : 2024-01-14</div>
+      <div class="out-item"> • <span>Paket 1 Jam</span> : 20 pcs | Rp 200.000</div>
+      <div class="out-item"> • <span>Paket 1 Hari</span> : 5 pcs  | Rp 250.000</div>
+      <div class="out-total">TOTAL 2024-01-14 : Rp 450.000</div>
+      <div class="out-sep">-----------------------------</div>
+      <br>
+      <div class="out-sep">====================</div>
+      <div class="out-grand">GRAND TOTAL : Rp 1.420.000</div>
+    </div>
+  </div>
+
+  <!-- 06 ARSITEKTUR KODE -->
+  <div class="sec-title">06 · Arsitektur Kode</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">STRUKTUR CLASS & METHOD UTAMA</span>
+      <span class="badge">PYTHON · KIVY</span>
+    </div>
+    <div style="padding:20px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
+
+        <div style="background:var(--bg3);border:1px solid rgba(76,175,80,0.2);border-radius:4px;overflow:hidden;">
+          <div style="background:rgba(76,175,80,0.1);padding:10px 14px;border-bottom:1px solid rgba(76,175,80,0.2);">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--green-light);letter-spacing:1px;">CLASS: ColoredBox</div>
+          </div>
+          <div style="padding:14px;">
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">
+              Custom widget turunan <code style="font-family:'Share Tech Mono',monospace;background:rgba(76,175,80,0.1);color:var(--green-light);padding:1px 5px;border-radius:2px;">BoxLayout</code> dengan latar belakang berwarna. Menggunakan <code style="font-family:'Share Tech Mono',monospace;background:rgba(76,175,80,0.1);color:var(--green-light);padding:1px 5px;border-radius:2px;">RoundedRectangle</code> di canvas untuk sudut melengkung. Bind pos + size agar warna ikut saat resize.
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--bg3);border:1px solid rgba(59,130,246,0.2);border-radius:4px;overflow:hidden;">
+          <div style="background:rgba(59,130,246,0.1);padding:10px 14px;border-bottom:1px solid rgba(59,130,246,0.2);">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--pri-light);letter-spacing:1px;">CLASS: RekapApp — build()</div>
+          </div>
+          <div style="padding:14px;">
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Membangun seluruh UI secara programatik (tanpa .kv file). Menyusun 5 seksi: Header → Input Manual → Pencarian/Hapus → Hasil → Tombol Aksi.</div>
+          </div>
+        </div>
+
+        <div style="background:var(--bg3);border:1px solid rgba(255,152,0,0.2);border-radius:4px;overflow:hidden;">
+          <div style="background:rgba(255,152,0,0.1);padding:10px 14px;border-bottom:1px solid rgba(255,152,0,0.2);">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--amber-light);letter-spacing:1px;">METHOD: proses_excel()</div>
+          </div>
+          <div style="padding:14px;">
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Buka file .xlsx dengan openpyxl. Auto-detect header kolom menggunakan <code style="font-family:'Share Tech Mono',monospace;background:rgba(255,152,0,0.1);color:var(--amber-light);padding:1px 5px;border-radius:2px;">list.index()</code>. Handle tanggal datetime & string. Append ke all_data list.</div>
+          </div>
+        </div>
+
+        <div style="background:var(--bg3);border:1px solid rgba(139,92,246,0.2);border-radius:4px;overflow:hidden;">
+          <div style="background:rgba(139,92,246,0.1);padding:10px 14px;border-bottom:1px solid rgba(139,92,246,0.2);">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--purple-light);letter-spacing:1px;">METHOD: update_display()</div>
+          </div>
+          <div style="padding:14px;">
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Core rekap engine. Gunakan <code style="font-family:'Share Tech Mono',monospace;background:rgba(139,92,246,0.1);color:var(--purple-light);padding:1px 5px;border-radius:2px;">defaultdict</code> untuk grupkan data. Hasilkan dua string: markup Kivy + plain text. Hitung Grand Total akumulasi.</div>
+          </div>
+        </div>
+
+        <div style="background:var(--bg3);border:1px solid rgba(229,57,53,0.2);border-radius:4px;overflow:hidden;">
+          <div style="background:rgba(229,57,53,0.1);padding:10px 14px;border-bottom:1px solid rgba(229,57,53,0.2);">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--red-light);letter-spacing:1px;">METHOD: hapus_data_tanggal()</div>
+          </div>
+          <div style="padding:14px;">
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Filter all_data menggunakan list comprehension — buang semua item dengan tanggal yang cocok. Tampilkan notifikasi jumlah data terhapus via <code style="font-family:'Share Tech Mono',monospace;background:rgba(229,57,53,0.1);color:var(--red-light);padding:1px 5px;border-radius:2px;">show_notif()</code>.</div>
+          </div>
+        </div>
+
+        <div style="background:var(--bg3);border:1px solid rgba(20,184,166,0.2);border-radius:4px;overflow:hidden;">
+          <div style="background:rgba(20,184,166,0.1);padding:10px 14px;border-bottom:1px solid rgba(20,184,166,0.2);">
+            <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:#5eead4;letter-spacing:1px;">METHOD: copy_ke_clipboard()</div>
+          </div>
+          <div style="padding:14px;">
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.8;">Salin <code style="font-family:'Share Tech Mono',monospace;background:rgba(20,184,166,0.1);color:#5eead4;padding:1px 5px;border-radius:2px;">hasil_text_bersih</code> (plain text tanpa markup Kivy) ke clipboard menggunakan <code style="font-family:'Share Tech Mono',monospace;background:rgba(20,184,166,0.1);color:#5eead4;padding:1px 5px;border-radius:2px;">Clipboard.copy()</code>. Auto-notif 3 detik.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 TAHAPAN PENGEMBANGAN -->
+  <div class="sec-title">07 · Tahapan Pengembangan</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">ALUR PENGEMBANGAN APLIKASI</span>
+      <span class="badge">DEV WORKFLOW</span>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">ANALISA KEBUTUHAN</div>
+          <div class="step-desc">Identifikasi kebutuhan pengguna: rekap penjualan voucher WiFi harian, input cepat via HP Android, dan kemudahan kirim laporan via WhatsApp. Tentukan format data Excel dari sistem voucher yang digunakan.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">PERANCANGAN UI (PYTHON KIVY)</div>
+          <div class="step-desc">Desain antarmuka menggunakan <code>BoxLayout</code>, <code>ScrollView</code>, dan <code>TextInput</code> secara programatik. Tema warna: biru muda (input), hijau muda (pencarian), putih (hasil). Custom widget <code>ColoredBox</code> dengan <code>RoundedRectangle</code>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">PENGEMBANGAN MODUL EXCEL</div>
+          <div class="step-desc">Integrasi <code>openpyxl</code> untuk membaca file .xlsx. Auto-detect kolom header menggunakan <code>list.index()</code>. Handle dua format tanggal: datetime object dan string. File chooser dengan filter <code>*.xlsx</code>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">ENGINE REKAP & KALKULASI</div>
+          <div class="step-desc">Implementasi <code>defaultdict</code> untuk pengelompokan otomatis per (tanggal, grup). Kalkulasi jumlah pcs, total rupiah, total per hari, dan Grand Total. Dua format output: markup Kivy untuk tampilan dan plain text untuk clipboard.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">5</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">FITUR HAPUS & PENCARIAN</div>
+          <div class="step-desc">Tambahkan fitur hapus data per tanggal menggunakan list comprehension. Implementasi filter pencarian real-time. Notifikasi auto-dismiss 3 detik menggunakan <code>Clock.schedule_once()</code>.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">6</div></div>
+        <div class="step-content">
+          <div class="step-title">BUILD & DEPLOY ANDROID</div>
+          <div class="step-desc">Build APK menggunakan <code>Buildozer</code> atau <code>python-for-android</code>. Tambahkan permission Android: <code>READ_EXTERNAL_STORAGE</code>. Tes pada perangkat Android nyata, optimasi ukuran font dan layout untuk layar kecil.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 08 STACK TEKNOLOGI -->
+  <div class="sec-title">08 · Stack Teknologi</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">LIBRARY & TOOLS YANG DIGUNAKAN</span>
+      <span class="badge badge-amber">PYTHON ECOSYSTEM</span>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-item"><div class="stack-icon">🐍</div><div><div class="stack-name">Python 3.8+</div><div class="stack-sub">Bahasa Pemrograman Utama</div></div></div>
+      <div class="stack-item"><div class="stack-icon">📱</div><div><div class="stack-name">Kivy</div><div class="stack-sub">Cross-platform UI Framework</div></div></div>
+      <div class="stack-item"><div class="stack-icon">📊</div><div><div class="stack-name">openpyxl</div><div class="stack-sub">Baca / Tulis File Excel .xlsx</div></div></div>
+      <div class="stack-item"><div class="stack-icon">📋</div><div><div class="stack-name">Clipboard API</div><div class="stack-sub">Copy Hasil ke Clipboard</div></div></div>
+      <div class="stack-item"><div class="stack-icon">⏰</div><div><div class="stack-name">kivy.clock</div><div class="stack-sub">Auto-dismiss Notifikasi</div></div></div>
+      <div class="stack-item"><div class="stack-icon">🗂</div><div><div class="stack-name">defaultdict</div><div class="stack-sub">Pengelompokan Data Rekap</div></div></div>
+      <div class="stack-item"><div class="stack-icon">📅</div><div><div class="stack-name">datetime</div><div class="stack-sub">Format & Parse Tanggal</div></div></div>
+      <div class="stack-item"><div class="stack-icon">🤖</div><div><div class="stack-name">Buildozer</div><div class="stack-sub">Build APK Android</div></div></div>
+    </div>
+  </div>
+
+  <!-- 09 STRUKTUR EXCEL -->
+  <div class="sec-title">09 · Format File Excel yang Didukung</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">STRUKTUR KOLOM FILE .XLSX YANG DIBUTUHKAN</span>
+      <span class="badge badge-amber">AUTO-DETECT HEADER</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;padding:10px 16px;text-align:left;background:rgba(0,0,0,.2);border-bottom:1px solid var(--border);">Nama Kolom (Header)</th>
+            <th style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;padding:10px 16px;text-align:left;background:rgba(0,0,0,.2);border-bottom:1px solid var(--border);">Tipe Data</th>
+            <th style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;padding:10px 16px;text-align:left;background:rgba(0,0,0,.2);border-bottom:1px solid var(--border);">Keterangan</th>
+            <th style="font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;padding:10px 16px;background:rgba(0,0,0,.2);border-bottom:1px solid var(--border);">Wajib?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);"><code style="font-family:'Share Tech Mono',monospace;font-size:12px;background:rgba(76,175,80,0.1);color:var(--green-light);padding:2px 7px;border-radius:2px;">Grup pengguna</code></td>
+            <td style="padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);font-size:13px;color:var(--text-dim);">String</td>
+            <td style="padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);font-size:13px;color:var(--text-dim);">Nama paket/grup voucher (mis: Paket 1H, Paket 1D)</td>
+            <td style="padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);text-align:center;"><span style="background:rgba(76,175,80,0.15);color:var(--green-light);font-family:'Share Tech Mono',monospace;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid rgba(76,175,80,0.3);">WAJIB</span></td>
+          </tr>
+          <tr>
+            <td style="padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);"><code style="font-family:'Share Tech Mono',monospace;font-size:12px;background:rgba(76,175,80,0.1);color:var(--green-light);padding:2px 7px;border-radius:2px;">Harga</code></td>
+            <td style="padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);font-size:13px;color:var(--text-dim);">Integer / Float</td>
+            <td style="padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);font-size:13px;color:var(--text-dim);">Nominal harga per voucher dalam Rupiah</td>
+            <td style="padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);text-align:center;"><span style="background:rgba(76,175,80,0.15);color:var(--green-light);font-family:'Share Tech Mono',monospace;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid rgba(76,175,80,0.3);">WAJIB</span></td>
+          </tr>
+          <tr>
+            <td style="padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);"><code style="font-family:'Share Tech Mono',monospace;font-size:12px;background:rgba(76,175,80,0.1);color:var(--green-light);padding:2px 7px;border-radius:2px;">Diaktifkan di</code></td>
+            <td style="padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);font-size:13px;color:var(--text-dim);">Datetime / String</td>
+            <td style="padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);font-size:13px;color:var(--text-dim);">Tanggal aktivasi voucher. Otomatis dikonversi ke YYYY-MM-DD</td>
+            <td style="padding:11px 16px;border-bottom:1px solid rgba(42,53,80,0.5);text-align:center;"><span style="background:rgba(76,175,80,0.15);color:var(--green-light);font-family:'Share Tech Mono',monospace;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid rgba(76,175,80,0.3);">WAJIB</span></td>
+          </tr>
+          <tr>
+            <td style="padding:11px 16px;"><code style="font-family:'Share Tech Mono',monospace;font-size:12px;background:rgba(255,152,0,0.1);color:var(--amber-light);padding:2px 7px;border-radius:2px;">Kode voucher</code></td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--text-dim);">String</td>
+            <td style="padding:11px 16px;font-size:13px;color:var(--text-dim);">Kode unik voucher. Jika tidak ada kolom ini, otomatis diisi "N/A"</td>
+            <td style="padding:11px 16px;text-align:center;"><span style="background:rgba(255,152,0,0.12);color:var(--amber-light);font-family:'Share Tech Mono',monospace;font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid rgba(255,152,0,0.3);">OPSIONAL</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="tips">
+    <div class="tips-title">✅ KEUNGGULAN APLIKASI</div>
+    <ul>
+      <li>Cross-platform: satu kode Python berjalan di Android dan Desktop (Windows/Linux/macOS) tanpa modifikasi.</li>
+      <li>Auto-detect kolom Excel — tidak perlu atur urutan kolom, cukup nama header yang sesuai.</li>
+      <li>Dua format output (markup Kivy + plain text) memastikan hasil siap ditampilkan dan siap dikirim.</li>
+      <li>Fitur hapus per tanggal memudahkan koreksi data tanpa perlu hapus seluruh dataset.</li>
+      <li>Notifikasi auto-dismiss 3 detik memberikan feedback instan tanpa mengganggu alur kerja.</li>
+    </ul>
+  </div>
+
+  <!-- CATATAN -->
+  <div class="notes">
+    <div class="notes-title">⚠ PERSYARATAN & CATATAN TEKNIS</div>
+    <ul>
+      <li>Pastikan nama kolom di file Excel <b>persis sama</b> dengan yang didukung — "Grup pengguna", "Harga", "Diaktifkan di".</li>
+      <li>Untuk build APK Android, gunakan <b>Buildozer</b> dengan sistem operasi Linux (atau WSL di Windows).</li>
+      <li>Tambahkan <b>android.permissions = READ_EXTERNAL_STORAGE</b> di buildozer.spec untuk akses file di Android.</li>
+      <li>Kivy tidak mendukung semua widget native Android — gunakan <code style="font-family:'Share Tech Mono',monospace;background:rgba(229,57,53,0.1);color:var(--red-light);padding:1px 5px;border-radius:2px;">KivyMD</code> jika ingin tampilan Material Design.</li>
+    </ul>
+  </div>
+
+  <div class="footer">VOUCHER SALES PRO V4 · PYTHON KIVY · REKAP PENJUALAN VOUCHER WiFi · CREATED BY JUNAID ADZAN ISNAM</div>
+
+</div>
+</body>
+</html>
