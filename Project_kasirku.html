@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kasirku — Aplikasi Kasir Desktop · Kotlin</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Barlow:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pri:        #4285F4;
+    --pri-light:  #93c5fd;
+    --pri-dark:   #1A237E;
+    --green:      #34A853;
+    --green-light:#86efac;
+    --yellow:     #FBBC04;
+    --yellow-light:#fde68a;
+    --red:        #EA4335;
+    --red-light:  #fca5a5;
+    --purple:     #8b5cf6;
+    --purple-light:#c4b5fd;
+    --teal:       #14b8a6;
+    --bg:   #0A0E14;
+    --bg2:  #111620;
+    --bg3:  #1A2030;
+    --border:#2A3550;
+    --text: #C8D8F0;
+    --text-dim:#6A7A9A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden;}
+  body::before{
+    content:'';position:fixed;inset:0;
+    background-image:
+      linear-gradient(rgba(66,133,244,0.04) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(66,133,244,0.04) 1px,transparent 1px);
+    background-size:40px 40px;pointer-events:none;z-index:0;
+  }
+  .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:24px 16px 64px;}
+
+  .back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);text-decoration:none;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;padding:8px 14px;border:1px solid var(--border);background:var(--bg2);transition:all .2s;}
+  .back-btn:hover{color:var(--pri-light);border-color:rgba(66,133,244,0.4);}
+
+  /* HEADER */
+  .header{position:relative;overflow:hidden;padding:40px 32px;background:linear-gradient(135deg,rgba(66,133,244,0.12),rgba(66,133,244,0.02));border:1px solid rgba(66,133,244,0.35);border-radius:4px;margin-bottom:32px;}
+
+  /* Google color accent bar */
+  .header::after{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#4285F4 25%,#34A853 25% 50%,#FBBC04 50% 75%,#EA4335 75%);}
+  .header::before{content:'🛒';position:absolute;top:10px;right:20px;font-size:160px;opacity:0.04;line-height:1;}
+  .header-deco{position:absolute;top:26px;right:32px;font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(66,133,244,0.22);letter-spacing:2px;line-height:1.9;text-align:right;}
+  .header-tag{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--pri);letter-spacing:4px;text-transform:uppercase;margin-bottom:10px;}
+  .header h1{font-family:'Rajdhani',sans-serif;font-size:clamp(22px,4vw,36px);font-weight:700;color:#fff;letter-spacing:2px;margin-bottom:4px;line-height:1.2;}
+  .header h1 span{color:var(--pri-light);}
+  .header-sub{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);letter-spacing:2px;margin-bottom:12px;}
+  .header p{color:var(--text-dim);font-size:13px;font-weight:300;max-width:560px;line-height:1.8;}
+  .tags-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+  .tag{font-family:'Share Tech Mono',monospace;font-size:10px;padding:4px 10px;border-radius:2px;letter-spacing:1px;text-transform:uppercase;}
+  .tag-blue  {background:rgba(66,133,244,0.12);color:var(--pri-light);border:1px solid rgba(66,133,244,0.28);}
+  .tag-green {background:rgba(52,168,83,0.1);color:var(--green-light);border:1px solid rgba(52,168,83,0.28);}
+  .tag-yellow{background:rgba(251,188,4,0.1);color:var(--yellow-light);border:1px solid rgba(251,188,4,0.28);}
+  .tag-red   {background:rgba(234,67,53,0.1);color:var(--red-light);border:1px solid rgba(234,67,53,0.28);}
+  .tag-purple{background:rgba(139,92,246,0.1);color:var(--purple-light);border:1px solid rgba(139,92,246,0.28);}
+
+  .sec-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:2px;color:var(--pri-light);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+  .sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+
+  /* STAT */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px;margin-bottom:24px;}
+  .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;text-align:center;}
+  .stat-card:hover{border-color:rgba(66,133,244,0.38);transform:translateY(-2px);}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+  .stat-card:nth-child(1)::before{background:var(--pri);}
+  .stat-card:nth-child(2)::before{background:var(--green);}
+  .stat-card:nth-child(3)::before{background:var(--yellow);}
+  .stat-card:nth-child(4)::before{background:var(--red);}
+  .stat-card:nth-child(5)::before{background:var(--purple);}
+  .stat-card:nth-child(6)::before{background:var(--teal);}
+  .stat-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1.5px;margin-bottom:8px;}
+  .stat-val{font-family:'Rajdhani',sans-serif;font-size:clamp(18px,3vw,24px);font-weight:700;color:var(--pri-light);line-height:1;}
+  .stat-unit{font-size:11px;color:var(--text-dim);margin-top:4px;}
+
+  /* CARD */
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:24px;overflow:hidden;}
+  .card-head{background:var(--bg3);padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .card-head .label{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;}
+  .badge{font-family:'Share Tech Mono',monospace;font-size:11px;background:rgba(66,133,244,0.12);color:var(--pri-light);border:1px solid rgba(66,133,244,0.3);padding:3px 10px;border-radius:2px;}
+  .badge-green{background:rgba(52,168,83,0.12);color:var(--green-light);border-color:rgba(52,168,83,0.3);}
+  .badge-yellow{background:rgba(251,188,4,0.12);color:var(--yellow-light);border-color:rgba(251,188,4,0.3);}
+
+  /* DESKTOP MOCKUP */
+  .desktop-frame{background:#1e1e2e;border:2px solid rgba(66,133,244,0.35);border-radius:10px;overflow:hidden;box-shadow:0 0 40px rgba(66,133,244,0.12);max-width:700px;margin:0 auto;}
+  .desktop-topbar{background:#2a2a3a;height:36px;display:flex;align-items:center;padding:0 14px;gap:8px;border-bottom:1px solid rgba(255,255,255,0.06);}
+  .dt-dot{width:12px;height:12px;border-radius:50%;}
+  .dt-title{font-family:'Share Tech Mono',monospace;font-size:11px;color:rgba(255,255,255,0.4);margin-left:auto;margin-right:auto;letter-spacing:1px;}
+  .desktop-body{display:flex;min-height:380px;}
+
+  /* Sidebar kasir */
+  .kas-sidebar{width:180px;background:#111827;border-right:1px solid rgba(255,255,255,0.06);padding:12px 0;flex-shrink:0;}
+  .kas-logo{padding:10px 14px 14px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:8px;}
+  .kas-logo-text{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:1px;}
+  .kas-logo-sub{font-size:9px;color:rgba(255,255,255,0.3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+  .kas-menu-item{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:11px;color:rgba(255,255,255,0.45);cursor:pointer;transition:.15s;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
+  .kas-menu-item.active{background:rgba(66,133,244,0.18);color:#93c5fd;border-left:2px solid var(--pri);}
+  .kas-menu-item:hover:not(.active){background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.7);}
+  .kas-menu-icon{font-size:14px;width:18px;text-align:center;}
+
+  /* Main content kasir */
+  .kas-main{flex:1;background:#0f172a;padding:14px;overflow:hidden;}
+  .kas-toprow{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .kas-page-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:1px;}
+  .kas-btn{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;padding:5px 12px;border-radius:4px;border:none;cursor:pointer;letter-spacing:.5px;}
+  .kas-btn.primary{background:var(--pri);color:#fff;}
+  .kas-btn.success{background:var(--green);color:#fff;}
+  .kas-btn.danger{background:var(--red);color:#fff;}
+
+  /* Product grid */
+  .kas-products{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+  .kas-prod-card{background:#1e293b;border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:8px 7px;cursor:pointer;transition:.15s;}
+  .kas-prod-card:hover{border-color:rgba(66,133,244,0.4);background:rgba(66,133,244,0.08);}
+  .kas-prod-card.selected{border-color:var(--pri);background:rgba(66,133,244,0.15);}
+  .kas-prod-name{font-size:9px;color:#e2e8f0;font-weight:600;font-family:'Rajdhani',sans-serif;letter-spacing:.5px;margin-bottom:2px;}
+  .kas-prod-price{font-family:'Share Tech Mono',monospace;font-size:9px;color:#60a5fa;}
+  .kas-prod-stock{font-size:8px;color:rgba(255,255,255,0.3);}
+
+  /* Cart / order panel */
+  .kas-cart{background:#1e293b;border:1px solid rgba(255,255,255,0.07);border-radius:5px;padding:10px;}
+  .kas-cart-title{font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:1px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:5px;}
+  .kas-cart-item{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:9px;}
+  .kas-cart-item .ci-name{color:#e2e8f0;font-family:'Rajdhani',sans-serif;}
+  .kas-cart-item .ci-qty{color:#60a5fa;font-family:'Share Tech Mono',monospace;}
+  .kas-cart-item .ci-total{color:#86efac;font-family:'Share Tech Mono',monospace;}
+  .kas-total-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.1);}
+  .kas-total-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(255,255,255,0.4);}
+  .kas-total-val{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fbbf24;}
+  .kas-action-row{display:flex;gap:5px;margin-top:7px;}
+  .kas-action-row .kas-btn{flex:1;font-size:9px;padding:5px 0;text-align:center;}
+
+  /* Stats bar di mockup */
+  .kas-stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+  .kas-stat-mini{background:#1e293b;border-radius:4px;padding:8px;border:1px solid rgba(255,255,255,0.06);}
+  .kas-stat-mini .ksm-label{font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:.5px;margin-bottom:3px;}
+  .kas-stat-mini .ksm-val{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#e2e8f0;}
+
+  /* FITUR GRID */
+  .fitur-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;padding:20px;}
+  .fitur-card{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:16px 18px;transition:border-color .2s;position:relative;overflow:hidden;}
+  .fitur-card:hover{border-color:rgba(66,133,244,0.35);}
+  .fitur-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
+  .fitur-card.c1::before{background:var(--pri);}
+  .fitur-card.c2::before{background:var(--green);}
+  .fitur-card.c3::before{background:var(--yellow);}
+  .fitur-card.c4::before{background:var(--red);}
+  .fitur-card.c5::before{background:var(--purple);}
+  .fitur-card.c6::before{background:var(--teal);}
+  .fitur-icon{font-size:22px;margin-bottom:10px;}
+  .fitur-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:#fff;margin-bottom:6px;}
+  .fitur-desc{font-size:12px;color:var(--text-dim);line-height:1.7;}
+
+  /* GOOGLE LOGO STEPS */
+  .g-badge{display:inline-flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:11px;padding:4px 10px;border-radius:2px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.25);color:var(--pri-light);}
+  .g-dot{width:8px;height:8px;border-radius:50%;}
+
+  /* STEPS */
+  .steps{padding:20px;display:flex;flex-direction:column;gap:0;}
+  .step{display:flex;gap:14px;position:relative;padding-bottom:20px;}
+  .step:last-child{padding-bottom:0;}
+  .step-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+  .step-num{width:32px;height:32px;border-radius:50%;background:rgba(66,133,244,0.14);border:1px solid rgba(66,133,244,0.4);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--pri-light);flex-shrink:0;z-index:1;}
+  .step-line{width:1px;flex:1;background:linear-gradient(to bottom,rgba(66,133,244,0.35),transparent);margin-top:4px;}
+  .step:last-child .step-line{display:none;}
+  .step-content{padding-top:4px;flex:1;}
+  .step-title{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:#fff;margin-bottom:4px;}
+  .step-desc{font-size:13px;color:var(--text-dim);line-height:1.75;}
+  .step-desc code{font-family:'Share Tech Mono',monospace;font-size:12px;background:rgba(66,133,244,0.1);color:var(--pri-light);padding:1px 6px;border-radius:2px;border:1px solid rgba(66,133,244,0.2);}
+
+  /* STACK */
+  .stack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;padding:20px;}
+  .stack-item{background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:3px;padding:14px 16px;display:flex;align-items:center;gap:12px;}
+  .stack-icon{width:36px;height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .si-blue  {background:rgba(66,133,244,0.12);border:1px solid rgba(66,133,244,0.2);}
+  .si-green {background:rgba(52,168,83,0.12);border:1px solid rgba(52,168,83,0.2);}
+  .si-yellow{background:rgba(251,188,4,0.12);border:1px solid rgba(251,188,4,0.2);}
+  .si-red   {background:rgba(234,67,53,0.12);border:1px solid rgba(234,67,53,0.2);}
+  .si-purple{background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);}
+  .si-teal  {background:rgba(20,184,166,0.12);border:1px solid rgba(20,184,166,0.2);}
+  .stack-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.5px;}
+  .stack-sub{font-size:11px;color:var(--text-dim);}
+
+  /* ARCH DIAGRAM */
+  .arch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;padding:20px;}
+  .arch-layer{background:var(--bg3);border:1px solid var(--border);border-radius:4px;overflow:hidden;}
+  .arch-layer-head{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+  .arch-layer-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .arch-layer-title{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;}
+  .arch-layer-body{padding:12px 14px;}
+  .arch-item{font-size:12px;color:var(--text-dim);padding:4px 0;border-bottom:1px solid rgba(42,53,80,0.3);line-height:1.5;}
+  .arch-item:last-child{border-bottom:none;}
+  .arch-item span{color:var(--text);}
+
+  /* GITHUB LINK */
+  .github-box{background:rgba(66,133,244,0.07);border:1px solid rgba(66,133,244,0.2);border-radius:4px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+  .github-icon{font-size:36px;flex-shrink:0;}
+  .github-info{flex:1;min-width:200px;}
+  .github-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:#fff;letter-spacing:1px;margin-bottom:4px;}
+  .github-desc{font-size:13px;color:var(--text-dim);line-height:1.6;}
+  .github-link{display:inline-flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--pri-light);text-decoration:none;padding:7px 14px;border:1px solid rgba(66,133,244,0.4);border-radius:3px;background:rgba(66,133,244,0.1);transition:all .2s;margin-top:10px;}
+  .github-link:hover{background:rgba(66,133,244,0.2);border-color:rgba(66,133,244,0.6);}
+
+  .tips{background:rgba(52,168,83,0.05);border:1px solid rgba(52,168,83,0.2);border-left:3px solid var(--green);padding:16px 20px;border-radius:3px;margin-bottom:24px;}
+  .tips-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--green-light);margin-bottom:10px;letter-spacing:1px;}
+  .tips ul{list-style:none;}
+  .tips ul li{font-size:13px;color:var(--text-dim);padding:4px 0 4px 16px;position:relative;line-height:1.7;}
+  .tips ul li::before{content:'▸';position:absolute;left:0;color:var(--green);opacity:.7;}
+
+  .notes{background:rgba(234,67,53,0.05);border:1px solid rgba(234,67,53,0.2);border-left:3px solid var(--red);padding:16px 20px;border-radius:3px;margin-bottom:24px;}
+  .notes-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--red-light);margin-bottom:10px;letter-spacing:1px;}
+  .notes ul{list-style:none;}
+  .notes ul li{font-size:13px;color:var(--text-dim);padding:4px 0 4px 16px;position:relative;line-height:1.7;}
+  .notes ul li::before{content:'▸';position:absolute;left:0;color:var(--red);opacity:.6;}
+
+  .footer{text-align:center;font-size:11px;color:var(--text-dim);margin-top:12px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+
+  @media(max-width:600px){
+    .stat-grid{grid-template-columns:1fr 1fr;}
+    .header h1{font-size:22px;}
+    .header-deco{display:none;}
+    .kas-sidebar{width:130px;}
+    .desktop-body{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="index.html" class="back-btn">← KEMBALI KE PORTFOLIO</a>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-deco">
+      PLATFORM: KOTLIN + COMPOSE<br>
+      BUILDER: GOOGLE AI STUDIO<br>
+      TYPE: DESKTOP APP<br>
+      MODEL: GEMINI (LATEST)<br>
+      STATUS: DEPLOYED ✓
+    </div>
+    <div class="header-tag">🛒 Desktop App — Kotlin · Google AI Studio</div>
+    <h1>KASIRKU <span>— DESKTOP APP</span></h1>
+    <div class="header-sub">KOTLIN · JETPACK COMPOSE · BUILT WITH GOOGLE AI STUDIO</div>
+    <p>
+      Aplikasi kasir desktop berbasis Kotlin yang dikembangkan menggunakan Google AI Studio.
+      Dirancang untuk pengelolaan transaksi penjualan, pencatatan produk, dan manajemen
+      data kasir secara efisien menggunakan antarmuka grafis lintas platform.
+    </p>
+    <div class="tags-row">
+      <span class="tag tag-blue">Kotlin</span>
+      <span class="tag tag-green">Jetpack Compose</span>
+      <span class="tag tag-yellow">Google AI Studio</span>
+      <span class="tag tag-blue">Desktop App</span>
+      <span class="tag tag-red">Gemini AI</span>
+      <span class="tag tag-purple">Cross-platform</span>
+    </div>
+  </div>
+
+  <!-- LINK GOOGLE AI STUDIO -->
+  <div class="github-box">
+    <div class="github-icon">🤖</div>
+    <div class="github-info">
+      <div class="github-title">Dibuat dengan Google AI Studio — Build Mode</div>
+      <div class="github-desc">
+        Kasirku dikembangkan menggunakan fitur <b style="color:var(--pri-light)">Build Mode</b> di Google AI Studio — platform vibe-coding
+        Google yang menghasilkan aplikasi Kotlin + Jetpack Compose dari deskripsi bahasa alami.
+        Seluruh kode di-generate oleh model Gemini secara otomatis.
+      </div>
+      <a href="https://ai.studio/apps/72cdde08-c53a-4598-ac86-672258a71615" target="_blank" class="github-link">
+        🔗 Buka di Google AI Studio →
+      </a>
+    </div>
+  </div>
+
+  <!-- 01 RINGKASAN -->
+  <div class="sec-title">01 · Ringkasan Aplikasi</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">BAHASA</div>
+      <div class="stat-val" style="font-size:16px;">Kotlin</div>
+      <div class="stat-unit">JVM Based</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">UI TOOLKIT</div>
+      <div class="stat-val" style="font-size:14px;">Compose</div>
+      <div class="stat-unit">Jetpack Compose</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">BUILDER</div>
+      <div class="stat-val" style="font-size:13px;">AI Studio</div>
+      <div class="stat-unit">Google Build Mode</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">MODEL AI</div>
+      <div class="stat-val" style="font-size:14px;">Gemini</div>
+      <div class="stat-unit">Code Generator</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">PLATFORM</div>
+      <div class="stat-val" style="font-size:13px;">Desktop</div>
+      <div class="stat-unit">Cross-platform</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">TIPE APP</div>
+      <div class="stat-val" style="font-size:14px;">Kasir</div>
+      <div class="stat-unit">POS System</div>
+    </div>
+  </div>
+
+  <!-- 02 UI MOCKUP DESKTOP -->
+  <div class="sec-title">02 · Tampilan Antarmuka (UI Mockup)</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">SIMULASI TAMPILAN DESKTOP APP — KASIRKU</span>
+      <span class="badge">DESKTOP PREVIEW</span>
+    </div>
+    <div style="padding:20px;">
+      <div class="desktop-frame">
+        <!-- Title bar -->
+        <div class="desktop-topbar">
+          <div class="dt-dot" style="background:#EA4335;"></div>
+          <div class="dt-dot" style="background:#FBBC04;"></div>
+          <div class="dt-dot" style="background:#34A853;"></div>
+          <div class="dt-title">Kasirku — Aplikasi Kasir Desktop</div>
+        </div>
+        <!-- App body -->
+        <div class="desktop-body">
+          <!-- Sidebar -->
+          <div class="kas-sidebar">
+            <div class="kas-logo">
+              <div class="kas-logo-text">🛒 Kasirku</div>
+              <div class="kas-logo-sub">v1.0 · Desktop</div>
+            </div>
+            <div class="kas-menu-item active"><span class="kas-menu-icon">🏠</span>Beranda</div>
+            <div class="kas-menu-item"><span class="kas-menu-icon">🛒</span>Transaksi</div>
+            <div class="kas-menu-item"><span class="kas-menu-icon">📦</span>Produk</div>
+            <div class="kas-menu-item"><span class="kas-menu-icon">📊</span>Laporan</div>
+            <div class="kas-menu-item"><span class="kas-menu-icon">🧑‍💼</span>Kasir</div>
+            <div class="kas-menu-item"><span class="kas-menu-icon">⚙️</span>Pengaturan</div>
+          </div>
+          <!-- Main -->
+          <div class="kas-main">
+            <!-- Stats mini -->
+            <div class="kas-toprow">
+              <div class="kas-page-title">📍 Transaksi Hari Ini</div>
+              <button class="kas-btn primary">+ Transaksi Baru</button>
+            </div>
+            <div class="kas-stats-bar">
+              <div class="kas-stat-mini">
+                <div class="ksm-label">TOTAL PENJUALAN</div>
+                <div class="ksm-val" style="color:#4ade80;">Rp 2.4Jt</div>
+              </div>
+              <div class="kas-stat-mini">
+                <div class="ksm-label">TRANSAKSI</div>
+                <div class="ksm-val" style="color:#60a5fa;">18 trx</div>
+              </div>
+              <div class="kas-stat-mini">
+                <div class="ksm-label">PRODUK TERJUAL</div>
+                <div class="ksm-val" style="color:#fbbf24;">47 item</div>
+              </div>
+            </div>
+            <!-- Product grid -->
+            <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:1px;margin-bottom:6px;">PILIH PRODUK</div>
+            <div class="kas-products">
+              <div class="kas-prod-card selected">
+                <div class="kas-prod-name">Kopi Hitam</div>
+                <div class="kas-prod-price">Rp 5.000</div>
+                <div class="kas-prod-stock">Stok: 50</div>
+              </div>
+              <div class="kas-prod-card">
+                <div class="kas-prod-name">Kopi Susu</div>
+                <div class="kas-prod-price">Rp 8.000</div>
+                <div class="kas-prod-stock">Stok: 35</div>
+              </div>
+              <div class="kas-prod-card">
+                <div class="kas-prod-name">Teh Manis</div>
+                <div class="kas-prod-price">Rp 5.000</div>
+                <div class="kas-prod-stock">Stok: 60</div>
+              </div>
+              <div class="kas-prod-card">
+                <div class="kas-prod-name">Indomie Goreng</div>
+                <div class="kas-prod-price">Rp 15.000</div>
+                <div class="kas-prod-stock">Stok: 25</div>
+              </div>
+              <div class="kas-prod-card">
+                <div class="kas-prod-name">Roti Bakar</div>
+                <div class="kas-prod-price">Rp 12.000</div>
+                <div class="kas-prod-stock">Stok: 18</div>
+              </div>
+              <div class="kas-prod-card">
+                <div class="kas-prod-name">Air Mineral</div>
+                <div class="kas-prod-price">Rp 3.000</div>
+                <div class="kas-prod-stock">Stok: 100</div>
+              </div>
+            </div>
+            <!-- Cart -->
+            <div class="kas-cart">
+              <div class="kas-cart-title">KERANJANG TRANSAKSI</div>
+              <div class="kas-cart-item">
+                <span class="ci-name">Kopi Hitam</span>
+                <span class="ci-qty">2×</span>
+                <span class="ci-total">Rp 10.000</span>
+              </div>
+              <div class="kas-cart-item">
+                <span class="ci-name">Indomie Goreng</span>
+                <span class="ci-qty">1×</span>
+                <span class="ci-total">Rp 15.000</span>
+              </div>
+              <div class="kas-total-row">
+                <span class="kas-total-label">TOTAL BAYAR</span>
+                <span class="kas-total-val">Rp 25.000</span>
+              </div>
+              <div class="kas-action-row">
+                <button class="kas-btn danger">🗑 Hapus</button>
+                <button class="kas-btn success">✓ Bayar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 FITUR UTAMA -->
+  <div class="sec-title">03 · Fitur Utama Aplikasi</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">MODUL & FITUR KASIRKU</span>
+      <span class="badge">6 FITUR UTAMA</span>
+    </div>
+    <div class="fitur-grid">
+      <div class="fitur-card c1">
+        <div class="fitur-icon">🛒</div>
+        <div class="fitur-title">Manajemen Transaksi</div>
+        <div class="fitur-desc">Input transaksi penjualan secara cepat dengan tampilan keranjang belanja. Pilih produk, atur jumlah, dan proses pembayaran dalam satu layar.</div>
+      </div>
+      <div class="fitur-card c2">
+        <div class="fitur-icon">📦</div>
+        <div class="fitur-title">Pencatatan Produk</div>
+        <div class="fitur-desc">Kelola database produk: tambah, edit, hapus produk. Tersimpan data nama, harga, stok, dan kategori setiap item yang dijual.</div>
+      </div>
+      <div class="fitur-card c3">
+        <div class="fitur-icon">📊</div>
+        <div class="fitur-title">Laporan Penjualan</div>
+        <div class="fitur-desc">Rekap otomatis penjualan harian, mingguan, dan bulanan. Statistik total transaksi, produk terlaris, dan pendapatan bersih.</div>
+      </div>
+      <div class="fitur-card c4">
+        <div class="fitur-icon">🧑‍💼</div>
+        <div class="fitur-title">Manajemen Kasir</div>
+        <div class="fitur-desc">Data kasir/operator yang bertugas. Buka dan tutup sesi kasir, pantau aktivitas setiap operator secara terpisah.</div>
+      </div>
+      <div class="fitur-card c5">
+        <div class="fitur-icon">🖥️</div>
+        <div class="fitur-title">Antarmuka Desktop</div>
+        <div class="fitur-desc">UI grafis modern berbasis Jetpack Compose untuk Desktop — sidebar navigasi, grid produk, dan panel transaksi yang responsif di berbagai ukuran layar.</div>
+      </div>
+      <div class="fitur-card c6">
+        <div class="fitur-icon">🤖</div>
+        <div class="fitur-title">AI-Generated Code</div>
+        <div class="fitur-desc">Seluruh kode aplikasi di-generate oleh model Gemini di Google AI Studio menggunakan fitur Build Mode — dari deskripsi bahasa natural menjadi aplikasi yang berfungsi.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 CARA DIBANGUN -->
+  <div class="sec-title">04 · Cara Dibangun — Google AI Studio</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">PROSES PENGEMBANGAN DENGAN AI STUDIO BUILD MODE</span>
+      <span class="badge badge-yellow">VIBE CODING</span>
+    </div>
+
+    <!-- Google color indicator -->
+    <div style="padding:14px 20px 0;display:flex;align-items:center;gap:8px;">
+      <div style="width:12px;height:12px;border-radius:50%;background:#4285F4;"></div>
+      <div style="width:12px;height:12px;border-radius:50%;background:#EA4335;"></div>
+      <div style="width:12px;height:12px;border-radius:50%;background:#FBBC04;"></div>
+      <div style="width:12px;height:12px;border-radius:50%;background:#34A853;"></div>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-left:4px;">GOOGLE AI STUDIO · BUILD MODE · GEMINI</span>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">BUKA GOOGLE AI STUDIO — BUILD MODE</div>
+          <div class="step-desc">
+            Kunjungi <code>aistudio.google.com</code> → masuk dengan akun Google → pilih mode
+            <code>Build</code>. AI Studio menyediakan antarmuka vibe-coding untuk membangun aplikasi
+            tanpa perlu setup SDK atau lingkungan pengembangan lokal.
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">TULIS PROMPT DESKRIPSI APLIKASI</div>
+          <div class="step-desc">
+            Input deskripsi aplikasi dalam bahasa natural: <code>"Buat aplikasi kasir desktop berbasis Kotlin dengan fitur transaksi penjualan, manajemen produk, dan laporan harian. Gunakan Jetpack Compose untuk UI."</code>
+            Gemini memahami konteks dan memecah kebutuhan menjadi komponen fungsional.
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">GEMINI GENERATE KODE KOTLIN + JETPACK COMPOSE</div>
+          <div class="step-desc">
+            Model Gemini secara otomatis menghasilkan proyek <code>Kotlin</code> lengkap dengan
+            <code>Jetpack Compose</code> sebagai UI toolkit utama. Kode dikelola oleh
+            <code>Antigravity Agent</code> — sistem AI yang menjaga konsistensi antar file dan
+            memahami seluruh konteks proyek.
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">PREVIEW & ITERASI DI EMULATOR BROWSER</div>
+          <div class="step-desc">
+            Aplikasi langsung dapat diuji di <code>emulator berbasis browser</code> tanpa install
+            software tambahan. Perbaiki dan tambah fitur dengan prompt lanjutan — Gemini
+            memperbarui kode secara incremental sambil menjaga konsistensi seluruh proyek.
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">5</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">EKSPOR & DEPLOY</div>
+          <div class="step-desc">
+            Proyek dapat diekspor sebagai file <code>ZIP</code> atau langsung ke
+            <code>GitHub</code> untuk pengembangan lanjutan di Android Studio / IntelliJ IDEA.
+            Aplikasi desktop Kotlin dapat di-build menjadi executable yang berjalan di
+            Windows, macOS, dan Linux.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 ARSITEKTUR -->
+  <div class="sec-title">05 · Arsitektur Aplikasi</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">STRUKTUR LAYER APLIKASI KASIRKU</span>
+      <span class="badge">KOTLIN · COMPOSE MULTIPLATFORM</span>
+    </div>
+    <div class="arch-grid">
+      <div class="arch-layer">
+        <div class="arch-layer-head">
+          <div class="arch-layer-dot" style="background:var(--pri);"></div>
+          <div class="arch-layer-title" style="color:var(--pri-light);">UI LAYER — JETPACK COMPOSE</div>
+        </div>
+        <div class="arch-layer-body">
+          <div class="arch-item"><span>TransaksiScreen</span> — halaman POS</div>
+          <div class="arch-item"><span>ProdukScreen</span> — kelola produk</div>
+          <div class="arch-item"><span>LaporanScreen</span> — rekap penjualan</div>
+          <div class="arch-item"><span>KasirScreen</span> — manajemen sesi</div>
+          <div class="arch-item"><span>NavigationSidebar</span> — sidebar menu</div>
+        </div>
+      </div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-head">
+          <div class="arch-layer-dot" style="background:var(--green);"></div>
+          <div class="arch-layer-title" style="color:var(--green-light);">VIEWMODEL / LOGIC</div>
+        </div>
+        <div class="arch-layer-body">
+          <div class="arch-item"><span>TransaksiViewModel</span></div>
+          <div class="arch-item"><span>ProdukViewModel</span></div>
+          <div class="arch-item"><span>LaporanViewModel</span></div>
+          <div class="arch-item"><span>KeranjangState</span> — cart state</div>
+          <div class="arch-item"><span>SessionManager</span></div>
+        </div>
+      </div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-head">
+          <div class="arch-layer-dot" style="background:var(--yellow);"></div>
+          <div class="arch-layer-title" style="color:var(--yellow-light);">DATA LAYER</div>
+        </div>
+        <div class="arch-layer-body">
+          <div class="arch-item"><span>ProdukRepository</span></div>
+          <div class="arch-item"><span>TransaksiRepository</span></div>
+          <div class="arch-item"><span>LocalDatabase</span> — SQLite</div>
+          <div class="arch-item"><span>DataStore</span> — settings</div>
+          <div class="arch-item"><span>Model Classes</span> — data class</div>
+        </div>
+      </div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-head">
+          <div class="arch-layer-dot" style="background:var(--red);"></div>
+          <div class="arch-layer-title" style="color:var(--red-light);">MODEL DATA</div>
+        </div>
+        <div class="arch-layer-body">
+          <div class="arch-item"><span>Produk</span> — id, nama, harga, stok</div>
+          <div class="arch-item"><span>Transaksi</span> — id, waktu, total</div>
+          <div class="arch-item"><span>ItemTransaksi</span> — produk, qty</div>
+          <div class="arch-item"><span>Kasir</span> — nama, sesi</div>
+          <div class="arch-item"><span>Laporan</span> — rekap harian</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 STACK TEKNOLOGI -->
+  <div class="sec-title">06 · Stack Teknologi</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="label">TEKNOLOGI & PLATFORM YANG DIGUNAKAN</span>
+      <span class="badge badge-yellow">GOOGLE ECOSYSTEM</span>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-item">
+        <div class="stack-icon si-blue">🤖</div>
+        <div>
+          <div class="stack-name">Google AI Studio</div>
+          <div class="stack-sub">Platform Build & Vibe Coding</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon si-yellow">✨</div>
+        <div>
+          <div class="stack-name">Gemini AI</div>
+          <div class="stack-sub">Code Generator Model</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon si-blue">🔷</div>
+        <div>
+          <div class="stack-name">Kotlin</div>
+          <div class="stack-sub">Bahasa Pemrograman Utama</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon si-green">🖼️</div>
+        <div>
+          <div class="stack-name">Jetpack Compose</div>
+          <div class="stack-sub">UI Toolkit Deklaratif</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon si-yellow">🗄️</div>
+        <div>
+          <div class="stack-name">Room / SQLite</div>
+          <div class="stack-sub">Database Lokal</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon si-purple">📐</div>
+        <div>
+          <div class="stack-name">MVVM Architecture</div>
+          <div class="stack-sub">Pola Arsitektur Aplikasi</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon si-teal">🔀</div>
+        <div>
+          <div class="stack-name">Kotlin Coroutines</div>
+          <div class="stack-sub">Async & Background Tasks</div>
+        </div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon si-red">🐙</div>
+        <div>
+          <div class="stack-name">GitHub</div>
+          <div class="stack-sub">Source Code & Version Control</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 LINK PROJECT -->
+  <div class="sec-title">07 · Akses Proyek</div>
+  <div class="github-box" style="border-color:rgba(251,188,4,0.3);background:rgba(251,188,4,0.05);">
+    <div class="github-icon">🛒</div>
+    <div class="github-info">
+      <div class="github-title">Kasirku — Live di Google AI Studio</div>
+      <div class="github-desc">
+        Proyek Kasirku dapat diakses, diuji, dan dikembangkan lebih lanjut langsung melalui Google AI Studio.
+        Gunakan link di bawah untuk membuka project dan melihat kode Kotlin yang dihasilkan oleh Gemini.
+        Ekspor ke Android Studio atau GitHub untuk pengembangan lanjutan.
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+        <a href="https://ai.studio/apps/72cdde08-c53a-4598-ac86-672258a71615" target="_blank" class="github-link" style="border-color:rgba(251,188,4,0.4);color:var(--yellow-light);background:rgba(251,188,4,0.08);">
+          🤖 Buka di Google AI Studio →
+        </a>
+        <a href="https://ai.google.dev/gemini-api/docs/aistudio-build-mode" target="_blank" class="github-link">
+          📖 Dokumentasi Build Mode →
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="tips">
+    <div class="tips-title">✅ KEUNGGULAN KASIRKU</div>
+    <ul>
+      <li>Dibangun dengan Google AI Studio Build Mode — development dari deskripsi ke aplikasi berfungsi dalam hitungan menit.</li>
+      <li>Kotlin + Jetpack Compose menghasilkan kode modern, aman dari null pointer, dan mudah di-maintain.</li>
+      <li>Arsitektur MVVM memisahkan UI dan logika bisnis secara bersih — mudah untuk ditambah fitur baru.</li>
+      <li>Cross-platform: satu kode Kotlin dapat berjalan di Windows, macOS, dan Linux (Compose Multiplatform).</li>
+      <li>Gemini Antigravity Agent menjaga konsistensi antar file saat iterasi dan penambahan fitur.</li>
+    </ul>
+  </div>
+
+  <!-- CATATAN -->
+  <div class="notes">
+    <div class="notes-title">⚠ CATATAN PENGEMBANGAN</div>
+    <ul>
+      <li>Untuk build executable desktop, gunakan <b>IntelliJ IDEA</b> atau <b>Android Studio</b> setelah ekspor proyek dari AI Studio.</li>
+      <li>Fitur lanjutan seperti cetak struk dan integrasi printer memerlukan plugin tambahan (<b>JavaPOS / CUPS</b>).</li>
+      <li>Database lokal SQLite cocok untuk skala kecil — pertimbangkan <b>PostgreSQL / Firebase</b> untuk multi-cabang.</li>
+      <li>Google AI Studio Build Mode masih dalam tahap awal — beberapa fitur kompleks mungkin perlu penyesuaian manual di Android Studio.</li>
+    </ul>
+  </div>
+
+  <div class="footer">KASIRKU · DESKTOP APP · KOTLIN + JETPACK COMPOSE · BUILT WITH GOOGLE AI STUDIO · GEMINI AI</div>
+
+</div>
+</body>
+</html>
