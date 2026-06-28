@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexCash — Aplikasi Keuangan Cerdas</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Barlow:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pri:#1a3a6b;--pri-mid:#1e5799;--pri-light:#4fc3f7;
+    --grn:#2ecc40;--grn-light:#86efac;--grn-mid:#27ae60;
+    --gold:#f1c40f;--gold-light:#fde68a;
+    --red:#e74c3c;--red-light:#fca5a5;
+    --purple:#8b5cf6;--purple-light:#c4b5fd;
+    --bg:#0A0E14;--bg2:#111620;--bg3:#1A2030;
+    --border:#2A3550;--text:#C8D8F0;--text-dim:#6A7A9A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(30,87,153,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(30,87,153,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+  body::after{content:'';position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:400px;background:radial-gradient(ellipse,rgba(46,204,64,0.05) 0%,transparent 70%);pointer-events:none;z-index:0;}
+  .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:24px 16px 64px;}
+
+  .back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);text-decoration:none;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;padding:8px 14px;border:1px solid var(--border);background:var(--bg2);transition:all .2s;}
+  .back-btn:hover{color:var(--grn-light);border-color:rgba(46,204,64,0.4);}
+
+  /* HEADER */
+  .header{position:relative;overflow:hidden;padding:36px 32px 36px 210px;background:linear-gradient(135deg,rgba(26,58,107,0.25),rgba(46,204,64,0.06));border:1px solid rgba(30,87,153,0.4);border-radius:6px;margin-bottom:32px;}
+  .header::after{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#1a3a6b 0%,#1e5799 30%,#2ecc40 60%,#1e5799 80%,#1a3a6b 100%);background-size:200% 100%;animation:shimmer 4s linear infinite;}
+  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+  .header-logo{position:absolute;left:24px;top:50%;transform:translateY(-50%);width:160px;height:130px;border-radius:10px;overflow:hidden;box-shadow:0 0 24px rgba(46,204,64,0.15),0 0 48px rgba(26,58,107,0.2);border:1px solid rgba(46,204,64,0.25);}
+  .header-logo img{width:100%;height:100%;object-fit:cover;}
+  .header-deco{position:absolute;top:20px;right:26px;font-family:'Share Tech Mono',monospace;font-size:10px;color:rgba(46,204,64,0.2);letter-spacing:2px;line-height:1.9;text-align:right;}
+  .header-tag{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--grn);letter-spacing:4px;text-transform:uppercase;margin-bottom:8px;}
+  .header h1{font-family:'Rajdhani',sans-serif;font-size:clamp(22px,4vw,36px);font-weight:700;color:#fff;letter-spacing:2px;margin-bottom:4px;line-height:1.2;}
+  .header h1 .nex{color:#e8f4fd;} .header h1 .cash{color:var(--grn);}
+  .header-tagline{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--grn-light);letter-spacing:3px;margin-bottom:10px;opacity:.7;}
+  .header-sub{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-dim);letter-spacing:2px;margin-bottom:12px;}
+  .header p{color:var(--text-dim);font-size:13px;font-weight:300;max-width:520px;line-height:1.8;}
+  .tags-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+  .tag{font-family:'Share Tech Mono',monospace;font-size:10px;padding:4px 10px;border-radius:2px;letter-spacing:1px;text-transform:uppercase;}
+  .tag-blue  {background:rgba(30,87,153,0.15);color:#90CAF9;border:1px solid rgba(30,87,153,0.35);}
+  .tag-green {background:rgba(46,204,64,0.1);color:var(--grn-light);border:1px solid rgba(46,204,64,0.28);}
+  .tag-yellow{background:rgba(241,196,15,0.1);color:var(--gold-light);border:1px solid rgba(241,196,15,0.28);}
+  .tag-purple{background:rgba(139,92,246,0.1);color:var(--purple-light);border:1px solid rgba(139,92,246,0.28);}
+  .tag-red   {background:rgba(231,76,60,0.1);color:var(--red-light);border:1px solid rgba(231,76,60,0.28);}
+
+  .sec-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:2px;color:var(--grn-light);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+  .sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+
+  /* STAT */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:14px;margin-bottom:24px;}
+  .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:18px 16px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;text-align:center;}
+  .stat-card:hover{border-color:rgba(46,204,64,0.38);transform:translateY(-2px);}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+  .stat-card:nth-child(odd)::before{background:linear-gradient(90deg,var(--pri-mid),var(--grn));}
+  .stat-card:nth-child(even)::before{background:linear-gradient(90deg,var(--grn-mid),var(--pri-light));}
+  .stat-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1.5px;margin-bottom:8px;}
+  .stat-val{font-family:'Rajdhani',sans-serif;font-size:clamp(17px,3vw,24px);font-weight:700;color:var(--grn-light);line-height:1;}
+  .stat-unit{font-size:11px;color:var(--text-dim);margin-top:4px;}
+
+  /* CARD */
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:24px;overflow:hidden;}
+  .card-head{background:var(--bg3);padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .card-head .label{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:1px;}
+  .badge{font-family:'Share Tech Mono',monospace;font-size:11px;background:rgba(46,204,64,0.12);color:var(--grn-light);border:1px solid rgba(46,204,64,0.3);padding:3px 10px;border-radius:2px;}
+  .badge-blue{background:rgba(30,87,153,0.15);color:#90CAF9;border-color:rgba(30,87,153,0.35);}
+  .badge-gold{background:rgba(241,196,15,0.12);color:var(--gold-light);border-color:rgba(241,196,15,0.3);}
+
+  /* LIVE BOX */
+  .live-box{background:linear-gradient(135deg,rgba(26,58,107,0.2),rgba(46,204,64,0.06));border:1px solid rgba(46,204,64,0.28);border-radius:6px;padding:22px 26px;margin-bottom:24px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;position:relative;overflow:hidden;}
+  .live-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#1a3a6b,#2ecc40,#1a3a6b);background-size:200% 100%;animation:shimmer 4s linear infinite;}
+  .live-logo{width:76px;height:76px;border-radius:14px;overflow:hidden;box-shadow:0 0 18px rgba(46,204,64,0.2);border:1px solid rgba(46,204,64,0.3);flex-shrink:0;}
+  .live-logo img{width:100%;height:100%;object-fit:cover;}
+  .live-info{flex:1;min-width:200px;}
+  .live-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#fff;letter-spacing:1px;margin-bottom:4px;}
+  .live-desc{font-size:13px;color:var(--text-dim);line-height:1.6;margin-bottom:12px;}
+  .live-link{display:inline-flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--grn-light);text-decoration:none;padding:7px 14px;border:1px solid rgba(46,204,64,0.4);border-radius:3px;background:rgba(46,204,64,0.08);transition:all .2s;margin-right:8px;margin-bottom:4px;}
+  .live-link:hover{background:rgba(46,204,64,0.18);border-color:rgba(46,204,64,0.7);}
+  .live-online{display:inline-flex;align-items:center;gap:5px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--grn-light);}
+  .live-online::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--grn);box-shadow:0 0 6px var(--grn);animation:blink 1.5s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* PHONE MOCKUP */
+  .phone-wrap{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;padding:24px 20px;}
+  .phone-frame{width:240px;background:#0d1117;border:2px solid rgba(30,87,153,0.4);border-radius:36px;overflow:hidden;box-shadow:0 0 30px rgba(46,204,64,0.08),0 0 60px rgba(26,58,107,0.15);flex-shrink:0;position:relative;}
+  .phone-notch-bar{background:#111;height:30px;display:flex;align-items:center;justify-content:center;}
+  .phone-notch{width:70px;height:16px;background:#000;border-radius:0 0 12px 12px;}
+  .phone-status{position:absolute;top:8px;left:14px;font-size:9px;color:rgba(255,255,255,0.3);font-family:'Share Tech Mono',monospace;}
+  .phone-battery{position:absolute;top:8px;right:14px;font-size:9px;color:rgba(255,255,255,0.3);font-family:'Share Tech Mono',monospace;}
+
+  /* App screen */
+  .app-screen{background:#0f172a;padding:0;}
+  .app-topbar{background:linear-gradient(135deg,#1a3a6b,#1e5799);padding:14px 14px 18px;display:flex;align-items:center;gap:10px;}
+  .app-nc-logo{width:32px;height:32px;border-radius:8px;overflow:hidden;flex-shrink:0;}
+  .app-nc-logo img{width:100%;height:100%;object-fit:cover;}
+  .app-app-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:1px;}
+  .app-app-sub{font-size:8px;color:rgba(255,255,255,0.5);font-family:'Share Tech Mono',monospace;}
+
+  /* Saldo card */
+  .app-saldo{background:linear-gradient(135deg,#1e5799,#2ecc40 150%);margin:10px;border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;}
+  .app-saldo::after{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.06);}
+  .app-saldo-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(255,255,255,0.6);letter-spacing:1px;margin-bottom:4px;}
+  .app-saldo-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:1px;}
+  .app-saldo-change{font-size:9px;color:rgba(255,255,255,0.7);font-family:'Share Tech Mono',monospace;margin-top:2px;}
+  .app-in-out{display:flex;gap:8px;margin-top:10px;}
+  .app-inout-item{flex:1;background:rgba(255,255,255,0.12);border-radius:8px;padding:7px 8px;text-align:center;}
+  .app-inout-label{font-size:8px;color:rgba(255,255,255,0.6);font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
+  .app-inout-val{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:#fff;margin-top:2px;}
+  .app-inout-icon{font-size:10px;margin-bottom:1px;}
+
+  /* Quick actions */
+  .app-actions{display:flex;gap:6px;padding:10px 10px 6px;justify-content:space-between;}
+  .app-action-btn{flex:1;background:#1e293b;border-radius:8px;padding:8px 4px;text-align:center;border:1px solid rgba(255,255,255,0.06);}
+  .app-action-icon{font-size:14px;margin-bottom:3px;}
+  .app-action-label{font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(255,255,255,0.4);letter-spacing:.3px;}
+
+  /* Transaksi list */
+  .app-section-label{padding:6px 12px 4px;font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:1px;}
+  .app-trx-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04);}
+  .app-trx-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+  .app-trx-info{flex:1;}
+  .app-trx-name{font-size:10px;color:#e2e8f0;font-weight:600;font-family:'Rajdhani',monospace;letter-spacing:.3px;}
+  .app-trx-kat{font-size:8px;color:rgba(255,255,255,0.3);font-family:'Share Tech Mono',monospace;}
+  .app-trx-amt{font-family:'Share Tech Mono',monospace;font-size:11px;font-weight:700;}
+  .app-trx-amt.masuk{color:#4ade80;}
+  .app-trx-amt.keluar{color:#f87171;}
+
+  /* Bar chart mini */
+  .app-chart{background:#1e293b;margin:8px 10px;border-radius:10px;padding:10px;}
+  .app-chart-label{font-family:'Share Tech Mono',monospace;font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:1px;margin-bottom:8px;}
+  .chart-bars{display:flex;gap:4px;align-items:flex-end;height:40px;}
+  .chart-bar-group{display:flex;gap:1px;align-items:flex-end;flex:1;}
+  .cbar{border-radius:2px 2px 0 0;flex:1;}
+  .cbar.in{background:var(--grn);}
+  .cbar.out{background:#ef4444;}
+  .chart-months{display:flex;gap:4px;margin-top:4px;}
+  .chart-month{flex:1;text-align:center;font-family:'Share Tech Mono',monospace;font-size:7px;color:rgba(255,255,255,0.25);}
+
+  /* FITUR GRID */
+  .fitur-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;padding:20px;}
+  .fitur-card{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:16px 18px;transition:border-color .2s;position:relative;overflow:hidden;}
+  .fitur-card:hover{border-color:rgba(46,204,64,0.35);}
+  .fitur-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;}
+  .fitur-card.c1::before{background:#2ecc40;}
+  .fitur-card.c2::before{background:#27ae60;}
+  .fitur-card.c3::before{background:#1e5799;}
+  .fitur-card.c4::before{background:var(--gold);}
+  .fitur-card.c5::before{background:var(--purple);}
+  .fitur-card.c6::before{background:var(--red);}
+  .fitur-icon{font-size:24px;margin-bottom:10px;}
+  .fitur-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;color:#fff;margin-bottom:6px;}
+  .fitur-desc{font-size:12px;color:var(--text-dim);line-height:1.75;}
+  .fitur-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+  .fitur-tag{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 7px;border-radius:2px;background:rgba(46,204,64,0.08);color:var(--grn-light);border:1px solid rgba(46,204,64,0.2);}
+
+  /* STEPS */
+  .steps{padding:20px;display:flex;flex-direction:column;gap:0;}
+  .step{display:flex;gap:14px;padding-bottom:20px;}
+  .step:last-child{padding-bottom:0;}
+  .step-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+  .step-num{width:32px;height:32px;border-radius:50%;background:rgba(46,204,64,0.14);border:1px solid rgba(46,204,64,0.4);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--grn-light);z-index:1;}
+  .step-line{width:1px;flex:1;background:linear-gradient(to bottom,rgba(46,204,64,0.35),transparent);margin-top:4px;}
+  .step:last-child .step-line{display:none;}
+  .step-content{padding-top:4px;flex:1;}
+  .step-title{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:#fff;margin-bottom:4px;}
+  .step-desc{font-size:13px;color:var(--text-dim);line-height:1.75;}
+  .step-desc code{font-family:'Share Tech Mono',monospace;font-size:12px;background:rgba(46,204,64,0.1);color:var(--grn-light);padding:1px 6px;border-radius:2px;border:1px solid rgba(46,204,64,0.2);}
+
+  /* STACK */
+  .stack-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:20px;}
+  .stack-item{background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:3px;padding:14px 16px;display:flex;align-items:center;gap:12px;}
+  .stack-icon{width:36px;height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .si-grn{background:rgba(46,204,64,0.12);border:1px solid rgba(46,204,64,0.2);}
+  .si-blue{background:rgba(30,87,153,0.15);border:1px solid rgba(30,87,153,0.25);}
+  .si-gold{background:rgba(241,196,15,0.12);border:1px solid rgba(241,196,15,0.2);}
+  .si-red{background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.2);}
+  .si-purple{background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);}
+  .stack-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.5px;}
+  .stack-sub{font-size:11px;color:var(--text-dim);}
+
+  /* CLOUD DIAGRAM */
+  .cloud-diagram{padding:24px 20px;display:flex;flex-direction:column;gap:16px;}
+  .cloud-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .cloud-device{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:8px;min-width:120px;}
+  .cloud-device span{font-size:18px;}
+  .cloud-arrow{font-family:'Share Tech Mono',monospace;font-size:9px;color:rgba(46,204,64,0.5);letter-spacing:1px;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .cloud-arrow .arr{font-size:14px;color:rgba(46,204,64,0.6);}
+  .cloud-center{background:linear-gradient(135deg,rgba(26,58,107,0.3),rgba(46,204,64,0.12));border:2px solid rgba(46,204,64,0.3);border-radius:10px;padding:16px 20px;text-align:center;flex:1;min-width:200px;box-shadow:0 0 20px rgba(46,204,64,0.07);}
+  .cloud-center-icon{font-size:28px;margin-bottom:6px;}
+  .cloud-center-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:1px;}
+  .cloud-center-sub{font-size:11px;color:var(--grn-light);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-top:2px;}
+
+  /* Kategori pills */
+  .kat-grid{display:flex;flex-wrap:wrap;gap:10px;padding:18px 20px;}
+  .kat-pill{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:8px 14px;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text);transition:border-color .2s;}
+  .kat-pill:hover{border-color:rgba(46,204,64,0.35);}
+  .kat-pill .ki{font-size:14px;}
+  .kat-pill.in-cat{border-color:rgba(46,204,64,0.25);}
+  .kat-pill.out-cat{border-color:rgba(231,76,60,0.2);}
+
+  .tips{background:rgba(46,204,64,0.05);border:1px solid rgba(46,204,64,0.2);border-left:3px solid var(--grn);padding:16px 20px;border-radius:3px;margin-bottom:24px;}
+  .tips-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--grn-light);margin-bottom:10px;letter-spacing:1px;}
+  .tips ul{list-style:none;}
+  .tips ul li{font-size:13px;color:var(--text-dim);padding:4px 0 4px 16px;position:relative;line-height:1.7;}
+  .tips ul li::before{content:'▸';position:absolute;left:0;color:var(--grn);opacity:.7;}
+
+  .notes{background:rgba(231,76,60,0.05);border:1px solid rgba(231,76,60,0.2);border-left:3px solid var(--red);padding:16px 20px;border-radius:3px;margin-bottom:24px;}
+  .notes-title{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--red-light);margin-bottom:10px;letter-spacing:1px;}
+  .notes ul{list-style:none;}
+  .notes ul li{font-size:13px;color:var(--text-dim);padding:4px 0 4px 16px;position:relative;line-height:1.7;}
+  .notes ul li::before{content:'▸';position:absolute;left:0;color:var(--red);opacity:.6;}
+
+  .footer{text-align:center;font-size:11px;color:var(--text-dim);margin-top:12px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+
+  @media(max-width:640px){
+    .header{padding:28px 16px 28px 16px;}
+    .header-logo{display:none;}
+    .stat-grid{grid-template-columns:1fr 1fr;}
+    .header h1{font-size:22px;}
+    .header-deco{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a href="index.html" class="back-btn">← KEMBALI KE PORTFOLIO</a>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logo">
+      <img src="data:image/jpeg;base64,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" alt="NexCash Logo">
+    </div>
+    <div class="header-deco">
+      PLATFORM: GOOGLE AI STUDIO<br>
+      MODEL: GEMINI (LATEST)<br>
+      SYNC: CLOUD REALTIME<br>
+      TARGET: INDIVIDU / UMKM<br>
+      STATUS: LIVE ●
+    </div>
+    <div class="header-tag">💰 Finance App — Google AI Studio</div>
+    <h1><span class="nex">Nex</span><span class="cash">Cash</span></h1>
+    <div class="header-tagline">— CATAT KEUANGAN, KENDALIKAN MASA DEPAN —</div>
+    <div class="header-sub">CLOUD SYNC · REAL-TIME · PENCATATAN KEUANGAN MODERN</div>
+    <p>
+      Aplikasi pencatatan keuangan modern untuk individu, UMKM, dan bisnis.
+      Kelola pemasukan dan pengeluaran secara mudah, cepat, dan real-time
+      dengan sinkronisasi cloud yang aman.
+    </p>
+    <div class="tags-row">
+      <span class="tag tag-blue">Google AI Studio</span>
+      <span class="tag tag-green">Gemini AI</span>
+      <span class="tag tag-green">Cloud Sync</span>
+      <span class="tag tag-yellow">Finance App</span>
+      <span class="tag tag-purple">Real-time</span>
+      <span class="tag tag-red">UMKM</span>
+    </div>
+  </div>
+
+  <!-- LIVE LINK -->
+  <div class="live-box">
+    <div class="live-logo">
+      <img src="data:image/jpeg;base64,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" alt="NexCash">
+    </div>
+    <div class="live-info">
+      <div class="live-title">NexCash — Live di Google AI Studio</div>
+      <div class="live-desc">Dikembangkan dengan <b style="color:var(--grn-light)">Google AI Studio Build Mode</b> menggunakan model Gemini. Aplikasi dapat dicoba langsung melalui link berikut.</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <a href="https://ai.studio/apps/f83e8e8c-42ab-484b-bc4f-fe71fa245113" target="_blank" class="live-link">🤖 Buka di Google AI Studio →</a>
+        <span class="live-online">APP LIVE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 01 RINGKASAN -->
+  <div class="sec-title">01 · Ringkasan Aplikasi</div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">BUILDER</div><div class="stat-val" style="font-size:12px;">AI Studio</div><div class="stat-unit">Google Build Mode</div></div>
+    <div class="stat-card"><div class="stat-label">MODEL AI</div><div class="stat-val" style="font-size:14px;">Gemini</div><div class="stat-unit">Code Generator</div></div>
+    <div class="stat-card"><div class="stat-label">PENYIMPANAN</div><div class="stat-val" style="font-size:13px;">Cloud</div><div class="stat-unit">Sync Otomatis</div></div>
+    <div class="stat-card"><div class="stat-label">TARGET USER</div><div class="stat-val" style="font-size:12px;">UMKM</div><div class="stat-unit">Individu & Bisnis</div></div>
+    <div class="stat-card"><div class="stat-label">UPDATE</div><div class="stat-val" style="font-size:13px;">Real-time</div><div class="stat-unit">Saldo Otomatis</div></div>
+    <div class="stat-card"><div class="stat-label">KEAMANAN</div><div class="stat-val" style="font-size:13px;">Enkripsi</div><div class="stat-unit">Data Terproteksi</div></div>
+  </div>
+
+  <!-- 02 MOBILE UI MOCKUP -->
+  <div class="sec-title">02 · Tampilan Antarmuka (UI Mockup)</div>
+  <div class="card">
+    <div class="card-head"><span class="label">SIMULASI LAYAR APLIKASI NEXCASH</span><span class="badge">MOBILE PREVIEW</span></div>
+    <div class="phone-wrap">
+
+      <!-- Screen 1: Dashboard -->
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);text-align:center;letter-spacing:1px;margin-bottom:8px;">DASHBOARD UTAMA</div>
+        <div class="phone-frame">
+          <div class="phone-notch-bar">
+            <span class="phone-status">9:41</span>
+            <div class="phone-notch"></div>
+            <span class="phone-battery">▓▓▓ 87%</span>
+          </div>
+          <div class="app-screen">
+            <div class="app-topbar">
+              <div class="app-nc-logo"><img src="data:image/jpeg;base64,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" alt="NC"></div>
+              <div>
+                <div class="app-app-name">NexCash</div>
+                <div class="app-app-sub">Halo, Junaid 👋</div>
+              </div>
+              <div style="margin-left:auto;font-size:16px;">🔔</div>
+            </div>
+            <!-- Saldo card -->
+            <div class="app-saldo">
+              <div class="app-saldo-label">TOTAL SALDO</div>
+              <div class="app-saldo-val">Rp 24.850.000</div>
+              <div class="app-saldo-change">↑ +12,5% dari bulan lalu</div>
+              <div class="app-in-out">
+                <div class="app-inout-item">
+                  <div class="app-inout-icon">↓</div>
+                  <div class="app-inout-label">Pemasukan</div>
+                  <div class="app-inout-val">Rp 15.250.000</div>
+                </div>
+                <div class="app-inout-item">
+                  <div class="app-inout-icon">↑</div>
+                  <div class="app-inout-label">Pengeluaran</div>
+                  <div class="app-inout-val">Rp 9.600.000</div>
+                </div>
+              </div>
+            </div>
+            <!-- Quick actions -->
+            <div class="app-actions">
+              <div class="app-action-btn"><div class="app-action-icon">➕</div><div class="app-action-label">Pemasukan</div></div>
+              <div class="app-action-btn"><div class="app-action-icon">➖</div><div class="app-action-label">Pengeluaran</div></div>
+              <div class="app-action-btn"><div class="app-action-icon">📊</div><div class="app-action-label">Laporan</div></div>
+              <div class="app-action-btn"><div class="app-action-icon">🏷️</div><div class="app-action-label">Kategori</div></div>
+            </div>
+            <!-- Chart mini -->
+            <div class="app-chart">
+              <div class="app-chart-label">GRAFIK 6 BULAN</div>
+              <div class="chart-bars">
+                <div class="chart-bar-group"><div class="cbar in" style="height:60%"></div><div class="cbar out" style="height:40%"></div></div>
+                <div class="chart-bar-group"><div class="cbar in" style="height:75%"></div><div class="cbar out" style="height:55%"></div></div>
+                <div class="chart-bar-group"><div class="cbar in" style="height:50%"></div><div class="cbar out" style="height:70%"></div></div>
+                <div class="chart-bar-group"><div class="cbar in" style="height:85%"></div><div class="cbar out" style="height:45%"></div></div>
+                <div class="chart-bar-group"><div class="cbar in" style="height:65%"></div><div class="cbar out" style="height:60%"></div></div>
+                <div class="chart-bar-group"><div class="cbar in" style="height:100%"></div><div class="cbar out" style="height:63%"></div></div>
+              </div>
+              <div class="chart-months">
+                <div class="chart-month">Jan</div><div class="chart-month">Feb</div><div class="chart-month">Mar</div>
+                <div class="chart-month">Apr</div><div class="chart-month">Mei</div><div class="chart-month">Jun</div>
+              </div>
+            </div>
+            <!-- Transaksi -->
+            <div class="app-section-label">TRANSAKSI TERBARU</div>
+            <div class="app-trx-item">
+              <div class="app-trx-icon" style="background:rgba(46,204,64,0.15);">💼</div>
+              <div class="app-trx-info"><div class="app-trx-name">Gaji Bulan Ini</div><div class="app-trx-kat">Gaji · 01 Jun 2025</div></div>
+              <div class="app-trx-amt masuk">+Rp 8.000.000</div>
+            </div>
+            <div class="app-trx-item">
+              <div class="app-trx-icon" style="background:rgba(231,76,60,0.15);">🛒</div>
+              <div class="app-trx-info"><div class="app-trx-name">Belanja Bulanan</div><div class="app-trx-kat">Belanja · 03 Jun 2025</div></div>
+              <div class="app-trx-amt keluar">−Rp 1.200.000</div>
+            </div>
+            <div class="app-trx-item">
+              <div class="app-trx-icon" style="background:rgba(241,196,15,0.15);">📈</div>
+              <div class="app-trx-info"><div class="app-trx-name">Hasil Penjualan</div><div class="app-trx-kat">Penjualan · 05 Jun 2025</div></div>
+              <div class="app-trx-amt masuk">+Rp 3.500.000</div>
+            </div>
+            <div style="height:10px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Screen 2: Tambah Transaksi -->
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);text-align:center;letter-spacing:1px;margin-bottom:8px;">TAMBAH TRANSAKSI</div>
+        <div class="phone-frame">
+          <div class="phone-notch-bar">
+            <span class="phone-status">9:41</span>
+            <div class="phone-notch"></div>
+            <span class="phone-battery">▓▓▓ 87%</span>
+          </div>
+          <div class="app-screen">
+            <div class="app-topbar" style="padding:12px 14px;">
+              <div style="font-size:14px;color:rgba(255,255,255,0.6);">←</div>
+              <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:1px;margin:0 auto;">Tambah Transaksi</div>
+            </div>
+            <!-- Type selector -->
+            <div style="display:flex;gap:0;margin:12px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);">
+              <div style="flex:1;background:rgba(46,204,64,0.2);padding:8px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:#4ade80;border-right:1px solid rgba(255,255,255,0.08);">↓ PEMASUKAN</div>
+              <div style="flex:1;background:transparent;padding:8px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:12px;color:rgba(255,255,255,0.3);">↑ PENGELUARAN</div>
+            </div>
+            <!-- Form fields -->
+            <div style="padding:0 12px;display:flex;flex-direction:column;gap:8px;">
+              <div style="background:#1e293b;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 12px;">
+                <div style="font-size:8px;color:rgba(255,255,255,0.3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-bottom:4px;">NOMINAL</div>
+                <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:#4ade80;">Rp 3.500.000</div>
+              </div>
+              <div style="background:#1e293b;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 12px;">
+                <div style="font-size:8px;color:rgba(255,255,255,0.3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-bottom:4px;">KATEGORI</div>
+                <div style="font-size:11px;color:#e2e8f0;display:flex;align-items:center;gap:6px;">📈 <span>Penjualan</span></div>
+              </div>
+              <div style="background:#1e293b;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 12px;">
+                <div style="font-size:8px;color:rgba(255,255,255,0.3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-bottom:4px;">KETERANGAN</div>
+                <div style="font-size:11px;color:#e2e8f0;">Hasil penjualan produk Juni</div>
+              </div>
+              <div style="background:#1e293b;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 12px;">
+                <div style="font-size:8px;color:rgba(255,255,255,0.3);font-family:'Share Tech Mono',monospace;letter-spacing:1px;margin-bottom:4px;">TANGGAL</div>
+                <div style="font-size:11px;color:#e2e8f0;">05 Juni 2025</div>
+              </div>
+              <div style="background:linear-gradient(135deg,#1e5799,#2ecc40);border-radius:8px;padding:12px;text-align:center;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:1px;margin-top:4px;">✓ SIMPAN TRANSAKSI</div>
+            </div>
+            <div style="height:10px;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 03 FITUR UTAMA -->
+  <div class="sec-title">03 · Fitur Utama NexCash</div>
+  <div class="card">
+    <div class="card-head"><span class="label">6 FITUR UNGGULAN APLIKASI</span><span class="badge">PENCATATAN CERDAS</span></div>
+    <div class="fitur-grid">
+      <div class="fitur-card c1">
+        <div class="fitur-icon">☁️</div>
+        <div class="fitur-title">Penyimpanan Cloud Aman</div>
+        <div class="fitur-desc">Data keuangan tersimpan otomatis di cloud. Sinkronisasi antar perangkat secara real-time. Data tetap aman meski aplikasi dihapus atau perangkat berganti.</div>
+        <div class="fitur-tags"><span class="fitur-tag">Cloud Sync</span><span class="fitur-tag">Multi-device</span><span class="fitur-tag">Auto-backup</span></div>
+      </div>
+      <div class="fitur-card c2">
+        <div class="fitur-icon">💰</div>
+        <div class="fitur-title">Pencatatan Real-Time</div>
+        <div class="fitur-desc">Catat pemasukan dan pengeluaran kapan saja. Saldo otomatis terupdate secara real-time. Riwayat transaksi tersimpan rapi dan mudah dicari.</div>
+        <div class="fitur-tags"><span class="fitur-tag">Real-time</span><span class="fitur-tag">Auto-saldo</span><span class="fitur-tag">Riwayat</span></div>
+      </div>
+      <div class="fitur-card c3">
+        <div class="fitur-icon">📊</div>
+        <div class="fitur-title">Kategori Terorganisir</div>
+        <div class="fitur-desc">Kelompokkan transaksi berdasarkan kategori seperti Gaji, Penjualan, Belanja, Transportasi, Tagihan, dan Investasi untuk analisis yang lebih mudah.</div>
+        <div class="fitur-tags"><span class="fitur-tag">Kategori</span><span class="fitur-tag">Filter</span><span class="fitur-tag">Analisis</span></div>
+      </div>
+      <div class="fitur-card c4">
+        <div class="fitur-icon">📈</div>
+        <div class="fitur-title">Laporan & Analisis Otomatis</div>
+        <div class="fitur-desc">Grafik pemasukan dan pengeluaran yang informatif. Persentase penggunaan dana per kategori. Ringkasan keuangan harian, mingguan, bulanan, dan tahunan.</div>
+        <div class="fitur-tags"><span class="fitur-tag">Grafik</span><span class="fitur-tag">Persentase</span><span class="fitur-tag">Ringkasan</span></div>
+      </div>
+      <div class="fitur-card c5">
+        <div class="fitur-icon">🎯</div>
+        <div class="fitur-title">Pantau Arus Kas</div>
+        <div class="fitur-desc">Monitor kondisi keuangan secara langsung. Temukan kategori pengeluaran terbesar. Bantu pengambilan keputusan keuangan yang lebih tepat dan terencana.</div>
+        <div class="fitur-tags"><span class="fitur-tag">Arus Kas</span><span class="fitur-tag">Insight</span><span class="fitur-tag">Keputusan</span></div>
+      </div>
+      <div class="fitur-card c6">
+        <div class="fitur-icon">🔒</div>
+        <div class="fitur-title">Keamanan Data</div>
+        <div class="fitur-desc">Akun pengguna terproteksi dengan autentikasi aman. Data dienkripsi sebelum disimpan ke cloud. Akses data kapan saja dan di mana saja dengan login.</div>
+        <div class="fitur-tags"><span class="fitur-tag">Enkripsi</span><span class="fitur-tag">Auth</span><span class="fitur-tag">Privasi</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 CLOUD SYNC DIAGRAM -->
+  <div class="sec-title">04 · Arsitektur Cloud Sync</div>
+  <div class="card">
+    <div class="card-head"><span class="label">SINKRONISASI DATA ANTAR PERANGKAT</span><span class="badge">CLOUD ARCHITECTURE</span></div>
+    <div class="cloud-diagram">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:1px;text-align:center;margin-bottom:4px;">PERANGKAT PENGGUNA ↔ CLOUD SERVER ↔ PERANGKAT LAIN</div>
+      <div class="cloud-row" style="justify-content:center;">
+        <div class="cloud-device"><span>📱</span><div><div style="color:var(--text);font-family:'Rajdhani',sans-serif;font-weight:600;">HP Android</div><div style="font-size:9px;font-family:'Share Tech Mono',monospace;">NexCash App</div></div></div>
+        <div class="cloud-arrow"><div class="arr">⇆</div><div>Sync</div></div>
+        <div class="cloud-center">
+          <div class="cloud-center-icon">☁️</div>
+          <div class="cloud-center-title">NEXCASH CLOUD</div>
+          <div class="cloud-center-sub">Database Terenkripsi · Real-time Sync</div>
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap;">
+            <div style="font-size:10px;background:rgba(46,204,64,0.1);border:1px solid rgba(46,204,64,0.2);padding:3px 8px;border-radius:3px;color:var(--grn-light);font-family:'Share Tech Mono',monospace;">🔒 Enkripsi</div>
+            <div style="font-size:10px;background:rgba(46,204,64,0.1);border:1px solid rgba(46,204,64,0.2);padding:3px 8px;border-radius:3px;color:var(--grn-light);font-family:'Share Tech Mono',monospace;">👤 Auth</div>
+            <div style="font-size:10px;background:rgba(46,204,64,0.1);border:1px solid rgba(46,204,64,0.2);padding:3px 8px;border-radius:3px;color:var(--grn-light);font-family:'Share Tech Mono',monospace;">⚡ Real-time</div>
+          </div>
+        </div>
+        <div class="cloud-arrow"><div class="arr">⇆</div><div>Sync</div></div>
+        <div class="cloud-device"><span>💻</span><div><div style="color:var(--text);font-family:'Rajdhani',sans-serif;font-weight:600;">Laptop / PC</div><div style="font-size:9px;font-family:'Share Tech Mono',monospace;">Web Browser</div></div></div>
+      </div>
+      <div style="background:rgba(46,204,64,0.05);border:1px solid rgba(46,204,64,0.15);border-radius:4px;padding:14px 18px;">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--grn-light);letter-spacing:1px;margin-bottom:8px;">✓ KEUNGGULAN CLOUD SYNC</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;font-size:12px;color:var(--text-dim);line-height:1.7;">
+          <div>☁️ Data tidak hilang meski HP rusak atau aplikasi dihapus</div>
+          <div>📱 Login dari perangkat mana saja, data langsung tersedia</div>
+          <div>⚡ Perubahan satu perangkat langsung terlihat di perangkat lain</div>
+          <div>🔒 Enkripsi end-to-end melindungi privasi data keuangan Anda</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 KATEGORI -->
+  <div class="sec-title">05 · Kategori Keuangan</div>
+  <div class="card">
+    <div class="card-head"><span class="label">DAFTAR KATEGORI PEMASUKAN & PENGELUARAN</span><span class="badge">TERORGANISIR</span></div>
+    <div style="padding:14px 20px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--grn-light);letter-spacing:1px;">↓ PEMASUKAN</div>
+    <div class="kat-grid">
+      <div class="kat-pill in-cat"><span class="ki">💼</span> Gaji</div>
+      <div class="kat-pill in-cat"><span class="ki">📈</span> Penjualan</div>
+      <div class="kat-pill in-cat"><span class="ki">💹</span> Investasi</div>
+      <div class="kat-pill in-cat"><span class="ki">🏠</span> Sewa / Kontrak</div>
+      <div class="kat-pill in-cat"><span class="ki">🎁</span> Bonus / THR</div>
+      <div class="kat-pill in-cat"><span class="ki">💰</span> Lain-lain Masuk</div>
+    </div>
+    <div style="padding:6px 20px 6px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--red-light);letter-spacing:1px;border-top:1px solid var(--border);">↑ PENGELUARAN</div>
+    <div class="kat-grid" style="padding-top:0;">
+      <div class="kat-pill out-cat"><span class="ki">🛒</span> Belanja</div>
+      <div class="kat-pill out-cat"><span class="ki">🚗</span> Transportasi</div>
+      <div class="kat-pill out-cat"><span class="ki">⚡</span> Tagihan Listrik</div>
+      <div class="kat-pill out-cat"><span class="ki">💧</span> Tagihan Air</div>
+      <div class="kat-pill out-cat"><span class="ki">📱</span> Pulsa / Internet</div>
+      <div class="kat-pill out-cat"><span class="ki">🏥</span> Kesehatan</div>
+      <div class="kat-pill out-cat"><span class="ki">🍽️</span> Makan & Minum</div>
+      <div class="kat-pill out-cat"><span class="ki">📚</span> Pendidikan</div>
+      <div class="kat-pill out-cat"><span class="ki">🎮</span> Hiburan</div>
+      <div class="kat-pill out-cat"><span class="ki">💸</span> Lain-lain Keluar</div>
+    </div>
+  </div>
+
+  <!-- 06 CARA KERJA -->
+  <div class="sec-title">06 · Cara Menggunakan NexCash</div>
+  <div class="card">
+    <div class="card-head"><span class="label">PANDUAN PENGGUNAAN APLIKASI</span><span class="badge">5 LANGKAH</span></div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">DAFTAR & LOGIN AKUN</div>
+          <div class="step-desc">Buat akun NexCash menggunakan email. Verifikasi akun dan login. Profil dan data keuangan Anda terhubung ke akun ini — <code>data aman</code> meski ganti perangkat.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">CATAT TRANSAKSI PERTAMA</div>
+          <div class="step-desc">Tekan tombol <code>Pemasukan</code> atau <code>Pengeluaran</code>. Isi nominal, pilih kategori, tambahkan keterangan, dan simpan. Saldo <code>otomatis terupdate</code> secara real-time.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">KELOLA KATEGORI KEUANGAN</div>
+          <div class="step-desc">Atur kategori sesuai kebutuhan pribadi atau bisnis. Setiap transaksi diberi label kategori agar mudah dianalisis — temukan <code>pola pengeluaran</code> yang perlu diperhatikan.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div>
+        <div class="step-content">
+          <div class="step-title">PANTAU LAPORAN & GRAFIK</div>
+          <div class="step-desc">Buka menu <code>Laporan</code> untuk melihat grafik keuangan harian, mingguan, atau bulanan. Lihat persentase pengeluaran per kategori dan bandingkan dengan pemasukan.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-left"><div class="step-num">5</div></div>
+        <div class="step-content">
+          <div class="step-title">AKSES DARI MANA SAJA</div>
+          <div class="step-desc">Login di perangkat baru — seluruh data keuangan langsung tersedia berkat <code>Cloud Sync</code>. Tidak perlu transfer data manual atau khawatir kehilangan riwayat transaksi.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 STACK -->
+  <div class="sec-title">07 · Stack Teknologi</div>
+  <div class="card">
+    <div class="card-head"><span class="label">PLATFORM & TEKNOLOGI YANG DIGUNAKAN</span><span class="badge badge-gold">GOOGLE AI ECOSYSTEM</span></div>
+    <div class="stack-grid">
+      <div class="stack-item"><div class="stack-icon si-blue">🤖</div><div><div class="stack-name">Google AI Studio</div><div class="stack-sub">Platform Build Mode</div></div></div>
+      <div class="stack-item"><div class="stack-icon si-gold">✨</div><div><div class="stack-name">Gemini AI</div><div class="stack-sub">Code Generator & Logic</div></div></div>
+      <div class="stack-item"><div class="stack-icon si-grn">☁️</div><div><div class="stack-name">Cloud Database</div><div class="stack-sub">Penyimpanan & Sync</div></div></div>
+      <div class="stack-item"><div class="stack-icon si-blue">🔐</div><div><div class="stack-name">Auth System</div><div class="stack-sub">Login & Proteksi Akun</div></div></div>
+      <div class="stack-item"><div class="stack-icon si-grn">⚡</div><div><div class="stack-name">Real-time Sync</div><div class="stack-sub">Update Antar Perangkat</div></div></div>
+      <div class="stack-item"><div class="stack-icon si-gold">📊</div><div><div class="stack-name">Chart Engine</div><div class="stack-sub">Grafik & Visualisasi</div></div></div>
+      <div class="stack-item"><div class="stack-icon si-red">🔒</div><div><div class="stack-name">Data Encryption</div><div class="stack-sub">Keamanan End-to-End</div></div></div>
+      <div class="stack-item"><div class="stack-icon si-purple">📱</div><div><div class="stack-name">Responsive UI</div><div class="stack-sub">Mobile & Web Friendly</div></div></div>
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="tips">
+    <div class="tips-title">✅ KEUNGGULAN NEXCASH</div>
+    <ul>
+      <li><b>Cloud Sync otomatis</b> — data tidak pernah hilang meski HP rusak, hilang, atau aplikasi dihapus.</li>
+      <li>Antarmuka <b>sederhana dan intuitif</b> — cocok untuk pengguna awam sekalipun tanpa perlu pelatihan khusus.</li>
+      <li>Kategori keuangan yang <b>terorganisir</b> membantu menemukan kebiasaan pengeluaran dan peluang penghematan.</li>
+      <li>Laporan otomatis membantu UMKM membuat <b>keputusan bisnis berbasis data</b> keuangan nyata.</li>
+      <li>Dibangun dengan <b>Google AI Studio + Gemini</b> — pengembangan cepat dengan kualitas kode yang terstruktur.</li>
+    </ul>
+  </div>
+
+  <!-- CATATAN -->
+  <div class="notes">
+    <div class="notes-title">⚠ CATATAN PENGGUNAAN</div>
+    <ul>
+      <li>Fitur Cloud Sync memerlukan <b>koneksi internet aktif</b> saat menyimpan dan mengambil data.</li>
+      <li>Gunakan <b>kata sandi yang kuat</b> untuk melindungi akun dari akses tidak sah.</li>
+      <li>Untuk backup tambahan, gunakan fitur <b>ekspor data</b> secara berkala ke file lokal.</li>
+      <li>Google AI Studio Build Mode masih berkembang — beberapa fitur lanjutan mungkin perlu penyesuaian manual.</li>
+    </ul>
+  </div>
+
+  <div class="footer">NEXCASH · CATAT KEUANGAN, KENDALIKAN MASA DEPAN · GOOGLE AI STUDIO · GEMINI AI · CLOUD SYNC</div>
+
+</div>
+</body>
+</html>
