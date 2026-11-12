@@ -166,6 +166,25 @@ footer{background:var(--soft);border-top:1px solid var(--border);text-align:cent
 .to-top{position:fixed;right:1.4rem;bottom:1.4rem;width:44px;height:44px;border-radius:50%;background:#0f172a;color:var(--accent-fill);display:grid;place-items:center;text-decoration:none;font-weight:700;box-shadow:var(--shadow-md);opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .25s,transform .25s,visibility .25s;z-index:90}
 .to-top.show{opacity:1;visibility:visible;transform:none}
 
+/* ── SERTIFIKAT UNGGULAN (SKK) ── */
+.cert-feature{grid-column:1/-1;display:grid;grid-template-columns:1.05fr 1fr;gap:2rem;align-items:center;border:1px solid rgba(245,158,11,.45);background:linear-gradient(160deg,rgba(245,158,11,.08),#fff 55%);border-radius:18px;padding:1.8rem;box-shadow:var(--shadow-sm)}
+.cert-tag{display:inline-block;font-size:.76rem;font-weight:700;color:#b45309;background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.38);padding:.28rem .75rem;border-radius:999px}
+.cert-feature h4{font-size:1.45rem;font-weight:800;color:var(--heading);letter-spacing:-.015em;margin:.9rem 0 .15rem;line-height:1.25}
+.cert-sub{font-size:.95rem;color:var(--accent2);font-weight:600;margin-bottom:1.1rem}
+.cert-meta{list-style:none}
+.cert-meta li{display:flex;gap:.9rem;padding:.5rem 0;border-top:1px solid var(--border);font-size:.9rem;color:var(--heading);line-height:1.5}
+.cert-meta li span{flex:none;width:96px;font-size:.74rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-top:.15rem}
+.cert-hint{font-size:.78rem;color:var(--muted);margin-top:1rem}
+.cert-feature-imgs{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.cert-thumb{position:relative;display:block;padding:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff;cursor:zoom-in;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s,border-color .25s}
+.cert-thumb:hover,.cert-thumb:focus-visible{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:rgba(245,158,11,.6);outline:none}
+.cert-thumb img{display:block;width:100%;height:auto}
+.cert-thumb span{position:absolute;left:.6rem;bottom:.6rem;font-size:.72rem;font-weight:600;color:#fff;background:rgba(15,23,42,.78);padding:.2rem .6rem;border-radius:999px}
+.lightbox{position:fixed;inset:0;z-index:200;background:rgba(15,23,42,.88);display:flex;align-items:center;justify-content:center;padding:1.5rem;cursor:zoom-out}
+.lightbox[hidden]{display:none}
+.lightbox img{max-width:min(96vw,900px);max-height:92vh;border-radius:8px;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.5);cursor:default}
+.lightbox-close{position:absolute;top:1rem;right:1.2rem;width:44px;height:44px;border:0;border-radius:50%;background:#fff;color:var(--heading);font-size:1.7rem;line-height:1;cursor:pointer}
+
 /* ── RESPONSIVE ── */
 @media(max-width:1024px){
   .nav-toggle{display:flex}
@@ -174,10 +193,14 @@ footer{background:var(--soft);border-top:1px solid var(--border);text-align:cent
   .nav-menu a{padding:.75rem .9rem;font-size:.95rem}
 }
 @media(max-width:900px){
+  .cert-feature{grid-template-columns:1fr}
   .hero{grid-template-columns:1fr;min-height:auto;gap:2.5rem;padding-bottom:3.5rem}
   .about-grid{grid-template-columns:1fr;gap:2rem}
 }
 @media(max-width:640px){
+  .cert-feature{padding:1.3rem 1.1rem}
+  .cert-meta li{flex-direction:column;gap:.1rem}
+  .cert-meta li span{width:auto}
   section{padding-top:3.8rem;padding-bottom:3.8rem}
   .brand-text{font-size:.92rem}
   .skills-grid,.projects-grid,.certs-list{grid-template-columns:1fr}
@@ -824,6 +847,31 @@ footer{background:var(--soft);border-top:1px solid var(--border);text-align:cent
   </div>
 
   <div class="certs-list">
+    <div class="cert-feature reveal">
+      <div class="cert-feature-info">
+        <span class="cert-tag">✓ Sertifikat Kompetensi Kerja (SKK) · BNSP</span>
+        <h4>Ahli Muda Launching Girder</h4>
+        <p class="cert-sub">Junior Expert in Launching Girder — Jasa Konstruksi</p>
+        <ul class="cert-meta">
+          <li><span>Penerbit</span>LSP Petakindo Konstruksi Mandiri, atas nama Badan Nasional Sertifikasi Profesi</li>
+          <li><span>Klasifikasi</span>Mekanikal — Teknik Lifting</li>
+          <li><span>Kualifikasi</span>Ahli · Jenjang 7 (Tujuh)</li>
+          <li><span>Ditetapkan</span>Jakarta, 02 Agustus 2024</li>
+          <li><span>Masa berlaku</span>5 (lima) tahun</li>
+        </ul>
+        <p class="cert-hint">Klik gambar untuk memperbesar</p>
+      </div>
+      <div class="cert-feature-imgs">
+        <button type="button" class="cert-thumb" data-full="sertifikat_skk_1.jpg" aria-label="Perbesar Sertifikat Kompetensi, halaman 1">
+          <img src="sertifikat_skk_1.jpg" alt="Sertifikat Kompetensi SKK Ahli Muda Launching Girder, halaman 1" loading="lazy">
+          <span>Halaman 1</span>
+        </button>
+        <button type="button" class="cert-thumb" data-full="sertifikat_skk_2.jpg" aria-label="Perbesar Sertifikat Kompetensi, halaman 2">
+          <img src="sertifikat_skk_2.jpg" alt="Sertifikat Kompetensi SKK Ahli Muda Launching Girder, halaman 2" loading="lazy">
+          <span>Halaman 2</span>
+        </button>
+      </div>
+    </div>
     <div class="cert-item reveal">
       <div class="cert-badge">✓</div>
       <div class="cert-text">
@@ -858,29 +906,7 @@ footer{background:var(--soft);border-top:1px solid var(--border);text-align:cent
   </div>
 </section>
 
-  <div class="cert-item reveal">
-      <div class="cert-badge">✓</div>
-      <div class="cert-text">
-        <h4>Certificate of Competense</h4>
-        <h4>Construction Service</h4>
-        <p>Ahli Muda Launching Grider - BNSP · Bersertifikat</p>
-      </div>
-    </div>
-  </div>
-</section>
 
-<div class="cert-item reveal">
-      <div class="cert-badge">✓</div>
-      <div class="cert-text">
-        <h4>Certificate of Competense</h4>
-        <h4>Construction Service Developmenr Board</h4>
-        <p>Ahli Muda Launching Grider - LPJK PUPR · Bersertifikat</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-  
 <!-- CONTACT -->
 <section id="contact" class="contact-section">
   <div class="section-header reveal">
@@ -919,6 +945,11 @@ footer{background:var(--soft);border-top:1px solid var(--border);text-align:cent
   <div class="footer-copy">ELECTRICAL ENGINEER · MAKASSAR · INDONESIA</div>
 </footer>
 
+
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Pratinjau sertifikat">
+  <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Tutup pratinjau">×</button>
+  <img id="lightboxImg" alt="">
+</div>
 
 <a href="#home" class="to-top" id="toTop" aria-label="Kembali ke atas">↑</a>
 
@@ -1007,6 +1038,20 @@ footer{background:var(--soft);border-top:1px solid var(--border);text-align:cent
     });
   }, { threshold: 0.5 });
   document.querySelectorAll('.stat-card').forEach(c => statObserver.observe(c));
+
+  /* Pratinjau sertifikat (lightbox) */
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightboxImg');
+  function closeLb() { lb.hidden = true; lbImg.src = ''; document.body.style.overflow = ''; }
+  document.querySelectorAll('.cert-thumb').forEach(btn => btn.addEventListener('click', () => {
+    lbImg.src = btn.dataset.full;
+    lbImg.alt = btn.querySelector('img').alt;
+    lb.hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.getElementById('lightboxClose').focus();
+  }));
+  lb.addEventListener('click', e => { if (e.target !== lbImg) closeLb(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !lb.hidden) closeLb(); });
 })();
 </script>
 </body>
